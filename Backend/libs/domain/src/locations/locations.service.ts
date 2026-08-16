@@ -94,7 +94,7 @@ export class LocationsService {
     return {
       items: page.map((l) => this.serialize(l)),
       nextCursor: hasMore
-        ? encodeCursor({ id: page[page.length - 1]!.id })
+        ? encodeCursor({ id: page[page.length - 1].id })
         : null,
     };
   }

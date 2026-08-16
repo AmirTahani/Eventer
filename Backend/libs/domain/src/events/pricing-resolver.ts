@@ -44,7 +44,7 @@ export function resolveActivePrice(
   );
 
   for (let i = 0; i < sorted.length; i++) {
-    const tier = sorted[i]!;
+    const tier = sorted[i];
     const nextStarts = sorted[i + 1]?.startsAt;
     if (
       tier.startsAt.getTime() <= now.getTime() &&
@@ -87,11 +87,11 @@ export function validatePricingTiersInput(
 ): string | null {
   if (!tiers.length) return null;
   for (let i = 0; i < tiers.length; i++) {
-    const t = tiers[i]!;
+    const t = tiers[i];
     if (!(t.startsAt.getTime() < eventStartAt.getTime())) {
       return 'All pricing tier startsAt values must be before event startAt';
     }
-    if (i > 0 && !(t.startsAt.getTime() > tiers[i - 1]!.startsAt.getTime())) {
+    if (i > 0 && !(t.startsAt.getTime() > tiers[i - 1].startsAt.getTime())) {
       return 'Pricing tier startsAt values must be strictly increasing';
     }
   }

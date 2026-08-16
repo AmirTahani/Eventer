@@ -27,7 +27,19 @@ export function verifyTelegramLoginHash(
   const { hash, ...fields } = payload;
   const dataCheckString = Object.keys(fields)
     .sort()
-    .map((key) => `${key}:${(fields as Record<string, unknown>)[key]}`)
+    .map((key) => {
+      const value = (fields as Record<string, unknown>)[key];
+      const rendered =
+        typeof value === 'string' ||
+        typeof value === 'number' ||
+        typeof value === 'boolean' ||
+        typeof value === 'bigint'
+          ? String(value)
+          : value == null
+            ? ''
+            : JSON.stringify(value);
+      return `${key}:${rendered}`;
+    })
     .join('\n');
 
   const secretKey = createHash('sha256').update(botToken).digest();
@@ -51,7 +63,19 @@ export function signTelegramLoginPayload(
 ): string {
   const dataCheckString = Object.keys(payload)
     .sort()
-    .map((key) => `${key}:${(payload as Record<string, unknown>)[key]}`)
+    .map((key) => {
+      const value = (payload as Record<string, unknown>)[key];
+      const rendered =
+        typeof value === 'string' ||
+        typeof value === 'number' ||
+        typeof value === 'boolean' ||
+        typeof value === 'bigint'
+          ? String(value)
+          : value == null
+            ? ''
+            : JSON.stringify(value);
+      return `${key}:${rendered}`;
+    })
     .join('\n');
   const secretKey = createHash('sha256').update(botToken).digest();
   return createHmac('sha256', secretKey).update(dataCheckString).digest('hex');

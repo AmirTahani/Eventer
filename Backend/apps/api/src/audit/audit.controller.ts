@@ -19,10 +19,7 @@ export class AuditController {
   constructor(private readonly audit: AuditService) {}
 
   @Get()
-  list(
-    @CurrentUser() user: AuthUser,
-    @Query() query: ListAuditLogsQueryDto,
-  ) {
+  list(@CurrentUser() user: AuthUser, @Query() query: ListAuditLogsQueryDto) {
     return this.audit.list(user, query);
   }
 }

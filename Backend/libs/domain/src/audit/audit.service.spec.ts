@@ -74,7 +74,7 @@ describe('AuditService', () => {
     await service.list(admin, { entityType: 'Event', limit: 10 });
     expect(prisma.event.findMany).not.toHaveBeenCalled();
     expect(findMany).toHaveBeenCalled();
-    const arg = findMany.mock.calls[0][0];
-    expect(arg.where).toEqual({ AND: [{ entityType: 'Event' }] });
+    const calls = findMany.mock.calls as Array<[{ where?: unknown }]>;
+    expect(calls[0]?.[0].where).toEqual({ AND: [{ entityType: 'Event' }] });
   });
 });

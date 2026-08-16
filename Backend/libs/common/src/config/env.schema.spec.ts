@@ -77,18 +77,18 @@ describe('validateEnv', () => {
       ORCARAIL_NETWORK_ID: 'net',
       ORCARAIL_RETURN_URL: 'http://localhost:3001/payments/return',
     };
-    expect(() =>
-      validateEnv({ ...base, ORCARAIL_API_SECRET: '' }),
-    ).toThrow(/ORCARAIL_API_SECRET/);
+    expect(() => validateEnv({ ...base, ORCARAIL_API_SECRET: '' })).toThrow(
+      /ORCARAIL_API_SECRET/,
+    );
     expect(() =>
       validateEnv({ ...base, ORCARAIL_TOKEN_ID: undefined }),
     ).toThrow(/ORCARAIL_TOKEN_ID/);
-    expect(() =>
-      validateEnv({ ...base, ORCARAIL_NETWORK_ID: '' }),
-    ).toThrow(/ORCARAIL_NETWORK_ID/);
-    expect(() =>
-      validateEnv({ ...base, ORCARAIL_RETURN_URL: '' }),
-    ).toThrow(/ORCARAIL_RETURN_URL/);
+    expect(() => validateEnv({ ...base, ORCARAIL_NETWORK_ID: '' })).toThrow(
+      /ORCARAIL_NETWORK_ID/,
+    );
+    expect(() => validateEnv({ ...base, ORCARAIL_RETURN_URL: '' })).toThrow(
+      /ORCARAIL_RETURN_URL/,
+    );
   });
 
   it('accepts a custom ORCARAIL_BASE_URL for self-host', () => {
@@ -104,8 +104,6 @@ describe('validateEnv', () => {
       ORCARAIL_CANCEL_URL: 'https://app.example/payments/cancel',
     });
     expect(env.ORCARAIL_BASE_URL).toBe('https://payments.internal/api/v1');
-    expect(env.ORCARAIL_CANCEL_URL).toBe(
-      'https://app.example/payments/cancel',
-    );
+    expect(env.ORCARAIL_CANCEL_URL).toBe('https://app.example/payments/cancel');
   });
 });

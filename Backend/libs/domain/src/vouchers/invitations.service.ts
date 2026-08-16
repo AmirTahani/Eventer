@@ -19,10 +19,7 @@ export class InvitationsService {
     private readonly config: ConfigService<Env, true>,
   ) {}
 
-  async create(
-    actor: AuthUser,
-    input: { invitedTelegramUsername?: string },
-  ) {
+  async create(actor: AuthUser, input: { invitedTelegramUsername?: string }) {
     if (!this.policies.canInvite(actor)) {
       throw new ConflictException('Voucher or Admin role required');
     }
@@ -101,7 +98,10 @@ export class InvitationsService {
       if (!fresh || fresh.status !== InvitationStatus.PENDING) {
         // concurrent accept — re-run idempotent path
         if (fresh?.status === InvitationStatus.ACCEPTED) {
-          if (fresh.invitedTelegramUserId === telegramUserId && fresh.acceptedUserId) {
+          if (
+            fresh.invitedTelegramUserId === telegramUserId &&
+            fresh.acceptedUserId
+          ) {
             const user = await tx.user.findUniqueOrThrow({
               where: { id: fresh.acceptedUserId },
             });
@@ -121,8 +121,7 @@ export class InvitationsService {
           where: { id: user.id },
           data: {
             firstName: input.firstName,
-            telegramUsername:
-              input.telegramUsername ?? user.telegramUsername,
+            telegramUsername: input.telegramUsername ?? user.telegramUsername,
             status: UserStatus.APPROVED,
             approvedAt: user.approvedAt ?? new Date(),
             vouchedByUserId: user.vouchedByUserId ?? fresh.voucherUserId,

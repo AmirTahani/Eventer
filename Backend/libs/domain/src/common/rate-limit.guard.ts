@@ -44,10 +44,9 @@ export class RateLimitGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const options = this.reflector.getAllAndOverride<RateLimitOptions | undefined>(
-      RATE_LIMIT_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const options = this.reflector.getAllAndOverride<
+      RateLimitOptions | undefined
+    >(RATE_LIMIT_KEY, [context.getHandler(), context.getClass()]);
     if (!options) return true;
 
     const req = context.switchToHttp().getRequest<{

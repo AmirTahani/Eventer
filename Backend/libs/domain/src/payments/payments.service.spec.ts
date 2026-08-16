@@ -30,9 +30,9 @@ describe('MockPaymentProvider', () => {
   });
 
   it('rejects invalid signatures', () => {
-    expect(
-      provider.verifyWebhookSignature('{}', 'deadbeef', secret),
-    ).toBe(false);
+    expect(provider.verifyWebhookSignature('{}', 'deadbeef', secret)).toBe(
+      false,
+    );
     expect(provider.verifyWebhookSignature('{}', undefined, secret)).toBe(
       false,
     );
@@ -202,13 +202,11 @@ describe('PaymentsService.createIntent', () => {
     );
 
     const result = await service.createIntent(user, 'reg-1');
-    expect(result).toMatchObject({
-      paymentId: 'pay-new',
-      provider: 'mock',
-      checkoutUrl: expect.stringContaining('mock_txn_pay-new'),
-      amount: '20.00',
-      currency: 'USD',
-    });
+    expect(result.paymentId).toBe('pay-new');
+    expect(result.provider).toBe('mock');
+    expect(result.checkoutUrl).toContain('mock_txn_pay-new');
+    expect(result.amount).toBe('20.00');
+    expect(result.currency).toBe('USD');
     expect(prisma.payment.update).toHaveBeenCalledWith(
       expect.objectContaining({
         data: { providerTransactionId: 'mock_txn_pay-new' },
@@ -388,11 +386,11 @@ describe('PaymentsService webhook handling', () => {
       .update(rawFail)
       .digest('hex');
     await service.handleWebhook('mock', rawFail, sigFail, failedBody);
-    expect(update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({ status: PaymentStatus.FAILED }),
-      }),
-    );
+    expect(
+      (update.mock.calls as Array<[{ data: { status: PaymentStatus } }]>).some(
+        (call) => call[0].data.status === PaymentStatus.FAILED,
+      ),
+    ).toBe(true);
 
     const processingBody = {
       transactionId: 'txn_proc',
@@ -404,11 +402,11 @@ describe('PaymentsService webhook handling', () => {
       .update(rawProc)
       .digest('hex');
     await service.handleWebhook('mock', rawProc, sigProc, processingBody);
-    expect(update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({ status: PaymentStatus.PROCESSING }),
-      }),
-    );
+    expect(
+      (update.mock.calls as Array<[{ data: { status: PaymentStatus } }]>).some(
+        (call) => call[0].data.status === PaymentStatus.PROCESSING,
+      ),
+    ).toBe(true);
   });
 
   it('uses ORCARAIL_WEBHOOK_SECRET for orcarail provider', async () => {
@@ -517,11 +515,11 @@ describe('PaymentsService.expireRegistration', () => {
         data: { status: RegistrationStatus.EXPIRED },
       }),
     );
-    expect(reservationUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({ status: 'RELEASED' }),
-      }),
-    );
+    expect(reservationUpdate).toHaveBeenCalled();
+    const reservationCalls = reservationUpdate.mock.calls as Array<
+      [{ data: { status: string } }]
+    >;
+    expect(reservationCalls[0]?.[0].data.status).toBe('RELEASED');
   });
 });
 
@@ -579,11 +577,11 @@ describe('PaymentsService.confirmPayment expiry race', () => {
     await service.confirmPayment('pay-1', 'txn_late', {});
     expect(regUpdateMany).not.toHaveBeenCalled();
     expect(tickets.issueForRegistration).not.toHaveBeenCalled();
-    expect(paymentUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({ status: PaymentStatus.CANCELLED }),
-      }),
-    );
+    expect(paymentUpdate).toHaveBeenCalled();
+    const paymentCalls = paymentUpdate.mock.calls as Array<
+      [{ data: { status: PaymentStatus } }]
+    >;
+    expect(paymentCalls[0]?.[0].data.status).toBe(PaymentStatus.CANCELLED);
   });
 
   it('refuses confirm when capacity reservation was already released', async () => {

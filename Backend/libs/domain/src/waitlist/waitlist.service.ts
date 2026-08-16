@@ -13,10 +13,7 @@ import {
 } from '@prisma/client';
 import { PrismaService } from '@eventer/db';
 import { AuthUser, canManageEvent } from '../auth/policies';
-import {
-  lockEventRow,
-  sumActiveReservations,
-} from '../registrations/capacity';
+import { lockEventRow, sumActiveReservations } from '../registrations/capacity';
 import { NotificationsService } from '../notifications/notifications.service';
 
 export const WAITLIST_OFFER_TTL_MS = 60 * 60 * 1000;

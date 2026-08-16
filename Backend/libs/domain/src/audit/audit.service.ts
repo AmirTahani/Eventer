@@ -137,7 +137,7 @@ export class AuditService {
         createdAt: row.createdAt.toISOString(),
       })),
       nextCursor: hasMore
-        ? encodeCursor({ id: page[page.length - 1]!.id })
+        ? encodeCursor({ id: page[page.length - 1].id })
         : null,
     };
   }

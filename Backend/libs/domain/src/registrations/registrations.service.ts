@@ -159,8 +159,7 @@ export class RegistrationsService {
               linkedUser = { connect: { id: linked.id } };
               firstName = g.firstName ?? linked.firstName;
               lastName = g.lastName ?? linked.lastName;
-              telegramUsername =
-                g.telegramUsername ?? linked.telegramUsername;
+              telegramUsername = g.telegramUsername ?? linked.telegramUsername;
             }
           }
 

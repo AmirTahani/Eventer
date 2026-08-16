@@ -49,10 +49,12 @@ describe('EventRemindersService', () => {
         }),
       },
       eventRegistration: {
-        findMany: jest.fn().mockResolvedValue([
-          { primaryUserId: 'u1' },
-          { primaryUserId: 'u2' },
-        ]),
+        findMany: jest
+          .fn()
+          .mockResolvedValue([
+            { primaryUserId: 'u1' },
+            { primaryUserId: 'u2' },
+          ]),
       },
     };
     const notifications = { enqueue } as never;

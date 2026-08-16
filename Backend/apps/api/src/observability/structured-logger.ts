@@ -41,7 +41,8 @@ export class StructuredLogger implements LoggerService {
     this.write('fatal', message, optionalParams);
   }
 
-  setLogLevels?(_levels: LogLevel[]) {
+  setLogLevels?(levels: LogLevel[]) {
+    void levels;
     // Nest calls this; levels are filtered by Nest itself for default logger.
   }
 

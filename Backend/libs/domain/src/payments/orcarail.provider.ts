@@ -47,7 +47,10 @@ export function mapOrcaRailWebhook(body: unknown): WebhookPayload {
     obj.status === 'completed'
   ) {
     status = 'succeeded';
-  } else if (type === 'payment_intent.processing' || obj.status === 'processing') {
+  } else if (
+    type === 'payment_intent.processing' ||
+    obj.status === 'processing'
+  ) {
     status = 'processing';
   } else if (
     type === 'payment_intent.canceled' ||
@@ -148,7 +151,9 @@ export class OrcaRailPaymentProvider implements PaymentProvider {
       );
     } catch {
       // Fallback HMAC if SDK throws (mirrors mock / docs)
-      const expected = createHmac('sha256', secret).update(rawBody).digest('hex');
+      const expected = createHmac('sha256', secret)
+        .update(rawBody)
+        .digest('hex');
       const provided = signatureHeader.replace(/^sha256=/i, '');
       try {
         const a = Buffer.from(provided);

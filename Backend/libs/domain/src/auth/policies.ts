@@ -21,9 +21,8 @@ export function hasRole(
   return user.roles.includes(role);
 }
 
-export function canManageEvent(
-  user: AuthUser,
-  organizerId: string,
-): boolean {
-  return isAdmin(user) || (hasRole(user, 'ORGANIZER') && user.id === organizerId);
+export function canManageEvent(user: AuthUser, organizerId: string): boolean {
+  return (
+    isAdmin(user) || (hasRole(user, 'ORGANIZER') && user.id === organizerId)
+  );
 }

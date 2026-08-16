@@ -48,7 +48,7 @@ export class TelegramBotService implements OnModuleInit, OnModuleDestroy {
     private readonly prisma: PrismaService,
   ) {}
 
-  async onModuleInit(): Promise<void> {
+  onModuleInit(): void {
     const token = this.config.get('TELEGRAM_BOT_TOKEN', { infer: true });
     const nodeEnv = this.config.get('NODE_ENV', { infer: true });
 
@@ -199,7 +199,7 @@ export class TelegramBotService implements OnModuleInit, OnModuleDestroy {
       await ctx.answerCallbackQuery();
       const auth = await this.requireAuth(ctx);
       if (!auth) return;
-      const eventId = ctx.match![1]!;
+      const eventId = ctx.match[1];
       try {
         const detail = await this.events.getById(auth, eventId);
         const loc = detail.location
@@ -233,7 +233,7 @@ export class TelegramBotService implements OnModuleInit, OnModuleDestroy {
       await ctx.answerCallbackQuery();
       const auth = await this.requireAuth(ctx);
       if (!auth) return;
-      const eventId = ctx.match![1]!;
+      const eventId = ctx.match[1];
       ctx.session.registerEventId = eventId;
       ctx.session.peopleCount = 1;
       const kb = new InlineKeyboard()
@@ -255,10 +255,7 @@ export class TelegramBotService implements OnModuleInit, OnModuleDestroy {
           .text(String(n), 'people:noop')
           .text('+', 'people:+')
           .row()
-          .text(
-            'Confirm',
-            `regconfirm:${ctx.session.registerEventId ?? ''}`,
-          ),
+          .text('Confirm', `regconfirm:${ctx.session.registerEventId ?? ''}`),
       });
     });
 
@@ -272,10 +269,7 @@ export class TelegramBotService implements OnModuleInit, OnModuleDestroy {
           .text(String(n), 'people:noop')
           .text('+', 'people:+')
           .row()
-          .text(
-            'Confirm',
-            `regconfirm:${ctx.session.registerEventId ?? ''}`,
-          ),
+          .text('Confirm', `regconfirm:${ctx.session.registerEventId ?? ''}`),
       });
     });
 
@@ -287,7 +281,7 @@ export class TelegramBotService implements OnModuleInit, OnModuleDestroy {
       await ctx.answerCallbackQuery();
       const auth = await this.requireAuth(ctx);
       if (!auth) return;
-      const eventId = ctx.match![1]!;
+      const eventId = ctx.match[1];
       const peopleCount = ctx.session.peopleCount ?? 1;
       const guests =
         peopleCount > 1
@@ -321,7 +315,8 @@ export class TelegramBotService implements OnModuleInit, OnModuleDestroy {
               '\nPay via the dashboard payment link when available to confirm your spot.';
           }
         } else if (reg.status === 'WAITLISTED') {
-          extra = '\nYou are on the waitlist — we will notify you if a spot opens.';
+          extra =
+            '\nYou are on the waitlist — we will notify you if a spot opens.';
         }
         await ctx.reply(
           `Registration created: ${reg.status} (${reg.peopleCount} people).${extra}`,
@@ -419,11 +414,19 @@ export class TelegramBotService implements OnModuleInit, OnModuleDestroy {
       await ctx.answerCallbackQuery();
       const auth = await this.requireAuth(ctx);
       if (!auth) return;
-      const locale = ctx.match![1] as 'en' | 'fa';
-      await this.users.setLocale(auth.id, locale === 'fa' ? Locale.fa : Locale.en);
-      await ctx.reply(locale === 'fa' ? 'زبان به فارسی تغییر کرد.' : 'Language set to English.', {
-        reply_markup: this.mainMenuKeyboard(locale),
-      });
+      const locale = ctx.match[1] as 'en' | 'fa';
+      await this.users.setLocale(
+        auth.id,
+        locale === 'fa' ? Locale.fa : Locale.en,
+      );
+      await ctx.reply(
+        locale === 'fa'
+          ? 'زبان به فارسی تغییر کرد.'
+          : 'Language set to English.',
+        {
+          reply_markup: this.mainMenuKeyboard(locale),
+        },
+      );
     });
 
     // Organizer: approve / reject / release location
@@ -431,7 +434,7 @@ export class TelegramBotService implements OnModuleInit, OnModuleDestroy {
       await ctx.answerCallbackQuery();
       const auth = await this.requireAuth(ctx);
       if (!auth) return;
-      const registrationId = ctx.match![1]!;
+      const registrationId = ctx.match[1];
       try {
         const reg = await this.registrations.approve(auth, registrationId);
         await ctx.reply(`Approved registration ${reg.id} → ${reg.status}`);
@@ -444,7 +447,7 @@ export class TelegramBotService implements OnModuleInit, OnModuleDestroy {
       await ctx.answerCallbackQuery();
       const auth = await this.requireAuth(ctx);
       if (!auth) return;
-      const registrationId = ctx.match![1]!;
+      const registrationId = ctx.match[1];
       try {
         const reg = await this.registrations.reject(auth, registrationId);
         await ctx.reply(`Rejected registration ${reg.id}`);
@@ -457,16 +460,12 @@ export class TelegramBotService implements OnModuleInit, OnModuleDestroy {
       await ctx.answerCallbackQuery();
       const auth = await this.requireAuth(ctx);
       if (!auth) return;
-      const eventId = ctx.match![1]!;
+      const eventId = ctx.match[1];
       try {
         const result = await this.events.releaseLocation(auth, eventId);
-        await ctx.reply(
-          `Location released at ${result.locationReleasedAt}`,
-        );
+        await ctx.reply(`Location released at ${result.locationReleasedAt}`);
       } catch (err) {
-        await ctx.reply(
-          err instanceof Error ? err.message : 'Release failed',
-        );
+        await ctx.reply(err instanceof Error ? err.message : 'Release failed');
       }
     });
   }

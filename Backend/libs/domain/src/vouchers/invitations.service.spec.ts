@@ -23,11 +23,7 @@ describe('InvitationsService', () => {
     const config = {
       get: jest.fn().mockReturnValue('EventBot'),
     } as unknown as ConfigService;
-    return new InvitationsService(
-      prisma as never,
-      policies,
-      config as never,
-    );
+    return new InvitationsService(prisma as never, policies, config as never);
   }
 
   it('rejects invalid token', async () => {

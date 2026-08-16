@@ -105,7 +105,12 @@ export class CheckinService {
       });
     }
 
-    return this.performCheckIn(user, ticket.id, input.eventId, CheckInMethod.QR);
+    return this.performCheckIn(
+      user,
+      ticket.id,
+      input.eventId,
+      CheckInMethod.QR,
+    );
   }
 
   async manual(user: AuthUser, input: { eventId: string; ticketId: string }) {

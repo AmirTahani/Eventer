@@ -1,11 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  Prisma,
-  TicketHolderType,
-  TicketStatus,
-} from '@prisma/client';
+import { Prisma, TicketHolderType, TicketStatus } from '@prisma/client';
 import { PrismaService } from '@eventer/db';
 import { AuthUser } from '../auth/policies';
 

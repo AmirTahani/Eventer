@@ -1,10 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  AuthUser,
-  canManageEvent,
-  hasRole,
-  isAdmin,
-} from './policies';
+import { AuthUser, canManageEvent, hasRole, isAdmin } from './policies';
 
 @Injectable()
 export class PoliciesService {
@@ -12,10 +7,7 @@ export class PoliciesService {
     return isAdmin(user);
   }
 
-  hasRole(
-    user: AuthUser,
-    role: 'ADMIN' | 'ORGANIZER' | 'VOUCHER',
-  ): boolean {
+  hasRole(user: AuthUser, role: 'ADMIN' | 'ORGANIZER' | 'VOUCHER'): boolean {
     return hasRole(user, role);
   }
 

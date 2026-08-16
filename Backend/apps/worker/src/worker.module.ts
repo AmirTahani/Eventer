@@ -1,17 +1,11 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { CommonModule } from '@eventer/common';
 import { DbModule } from '@eventer/db';
 import { DomainModule } from '@eventer/domain';
+import { WorkerJobsService } from './worker-jobs.service';
 
 @Module({
   imports: [CommonModule, DbModule, DomainModule],
+  providers: [WorkerJobsService],
 })
-export class WorkerModule implements OnModuleInit {
-  private readonly logger = new Logger(WorkerModule.name);
-
-  onModuleInit(): void {
-    this.logger.log(
-      'Worker process scaffolded — BullMQ processors arrive in M8/M9/M11',
-    );
-  }
-}
+export class WorkerModule {}

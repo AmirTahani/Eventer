@@ -18,6 +18,7 @@ import {
   RegistrationsService,
   Roles,
   RolesGuard,
+  WaitlistService,
   type AuthUser,
 } from '@eventer/domain';
 import { CancelEventDto } from './dto/cancel-event.dto';
@@ -36,6 +37,7 @@ export class EventsController {
   constructor(
     private readonly events: EventsService,
     private readonly registrations: RegistrationsService,
+    private readonly waitlistService: WaitlistService,
   ) {}
 
   @Get()
@@ -138,5 +140,12 @@ export class EventsController {
     @Body() body: CreateRegistrationDto,
   ) {
     return this.registrations.create(user, id, body);
+  }
+
+  @Get(':id/waitlist')
+  @UseGuards(RolesGuard)
+  @Roles('ORGANIZER', 'ADMIN')
+  waitlist(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.waitlistService.listForEvent(user, id);
   }
 }

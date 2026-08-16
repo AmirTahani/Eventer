@@ -19,6 +19,11 @@ export const envSchema = z.object({
   ADMIN_TELEGRAM_ID: z.string().optional(),
   BOT_SERVICE_TOKEN: z.string().min(16).default('dev-bot-service-token'),
   PAYMENT_PROVIDER: z.string().default('mock'),
+  PAYMENT_WEBHOOK_SECRET: z
+    .string()
+    .min(8)
+    .default('dev-payment-webhook-secret'),
+  TICKET_QR_SECRET: z.string().min(16).default('dev-ticket-qr-secret-change'),
   CORS_ORIGIN: z.string().default('http://localhost:3001'),
 });
 

@@ -4,9 +4,12 @@ import {
   CurrentUser,
   JwtAuthGuard,
   RegistrationsService,
+  Roles,
+  RolesGuard,
   type AuthUser,
 } from '@eventer/domain';
 import { CapacityRequestDto } from './dto/capacity-request.dto';
+import { RejectRegistrationDto } from './dto/reject-registration.dto';
 
 @ApiTags('registrations')
 @ApiBearerAuth()
@@ -14,6 +17,24 @@ import { CapacityRequestDto } from './dto/capacity-request.dto';
 @UseGuards(JwtAuthGuard)
 export class RegistrationsController {
   constructor(private readonly registrations: RegistrationsService) {}
+
+  @Post('registrations/:id/approve')
+  @UseGuards(RolesGuard)
+  @Roles('ORGANIZER', 'ADMIN')
+  approve(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.registrations.approve(user, id);
+  }
+
+  @Post('registrations/:id/reject')
+  @UseGuards(RolesGuard)
+  @Roles('ORGANIZER', 'ADMIN')
+  reject(
+    @CurrentUser() user: AuthUser,
+    @Param('id') id: string,
+    @Body() body: RejectRegistrationDto,
+  ) {
+    return this.registrations.reject(user, id, body.reason);
+  }
 
   @Post('registrations/:id/capacity-requests')
   requestCapacity(

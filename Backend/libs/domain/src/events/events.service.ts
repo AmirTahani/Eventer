@@ -19,6 +19,7 @@ import { moneyDecimal, moneyString } from '../common/money';
 import { DjsService } from '../djs/djs.service';
 import { FilesService } from '../files/files.service';
 import { LocationsService } from '../locations/locations.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { EventVisibilityService } from './event-visibility.service';
 import {
   resolveActivePrice,
@@ -48,6 +49,7 @@ export class EventsService {
     private readonly djs: DjsService,
     private readonly locations: LocationsService,
     private readonly files: FilesService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   private assertCanManage(user: AuthUser, organizerId: string) {
@@ -602,6 +604,21 @@ export class EventsService {
       where: { id },
       data: { locationReleasedAt: new Date() },
     });
+
+    const confirmed = await this.prisma.eventRegistration.findMany({
+      where: { eventId: id, status: RegistrationStatus.CONFIRMED },
+      select: { id: true, primaryUserId: true },
+    });
+    await this.notifications.enqueueMany(
+      confirmed.map((r) => ({
+        recipientUserId: r.primaryUserId,
+        type: 'location.released',
+        entityType: 'Event',
+        entityId: id,
+        dedupeKey: `event:${id}:location-released:user:${r.primaryUserId}`,
+      })),
+    );
+
     return {
       eventId: updated.id,
       locationReleasedAt: updated.locationReleasedAt!.toISOString(),
@@ -610,6 +627,20 @@ export class EventsService {
 
   async cancel(user: AuthUser, id: string, _reason?: string) {
     const event = await this.requireManagedEvent(user, id);
+
+    const activeStatuses: RegistrationStatus[] = [
+      RegistrationStatus.PENDING_APPROVAL,
+      RegistrationStatus.APPROVED,
+      RegistrationStatus.PENDING_PAYMENT,
+      RegistrationStatus.CONFIRMED,
+      RegistrationStatus.WAITLISTED,
+    ];
+    const recipients = await this.prisma.eventRegistration.findMany({
+      where: { eventId: id, status: { in: activeStatuses } },
+      select: { primaryUserId: true },
+      distinct: ['primaryUserId'],
+    });
+
     const updated = await this.prisma.$transaction(async (tx) => {
       const ev = await tx.event.update({
         where: { id },
@@ -625,7 +656,6 @@ export class EventsService {
         data: { status: 'VOID' },
       });
 
-      // Release active capacity reservations for non-terminal regs (cancel flow continues in M7/M9)
       await tx.capacityReservation.updateMany({
         where: { eventId: id, status: CapacityReservationStatus.ACTIVE },
         data: {
@@ -634,8 +664,23 @@ export class EventsService {
         },
       });
 
+      await tx.eventRegistration.updateMany({
+        where: { eventId: id, status: { in: activeStatuses } },
+        data: { status: RegistrationStatus.CANCELLED },
+      });
+
       return ev;
     });
+
+    await this.notifications.enqueueMany(
+      recipients.map((r) => ({
+        recipientUserId: r.primaryUserId,
+        type: 'event.cancelled',
+        entityType: 'Event',
+        entityId: id,
+        dedupeKey: `event:${id}:cancelled:user:${r.primaryUserId}`,
+      })),
+    );
 
     const remaining = await this.remainingCapacity(
       updated.id,

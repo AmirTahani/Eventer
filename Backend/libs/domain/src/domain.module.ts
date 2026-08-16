@@ -7,6 +7,11 @@ import { LocationsModule } from './locations/locations.module';
 import { FilesModule } from './files/files.module';
 import { EventsModule } from './events/events.module';
 import { RegistrationsModule } from './registrations/registrations.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { WaitlistModule } from './waitlist/waitlist.module';
+import { PaymentsModule } from './payments/payments.module';
+import { TicketsModule } from './tickets/tickets.module';
+import { CheckinModule } from './checkin/checkin.module';
 
 @Module({
   imports: [
@@ -18,6 +23,11 @@ import { RegistrationsModule } from './registrations/registrations.module';
     FilesModule,
     EventsModule,
     RegistrationsModule,
+    NotificationsModule,
+    WaitlistModule,
+    PaymentsModule,
+    TicketsModule,
+    CheckinModule,
   ],
   exports: [
     AuthModule,
@@ -28,6 +38,11 @@ import { RegistrationsModule } from './registrations/registrations.module';
     FilesModule,
     EventsModule,
     RegistrationsModule,
+    NotificationsModule,
+    WaitlistModule,
+    PaymentsModule,
+    TicketsModule,
+    CheckinModule,
   ],
 })
 export class DomainModule {}

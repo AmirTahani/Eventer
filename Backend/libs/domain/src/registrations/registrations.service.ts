@@ -21,19 +21,21 @@ import {
 import { moneyMultiply, moneyString } from '../common/money';
 import { EventsService } from '../events/events.service';
 import { resolveActivePrice } from '../events/pricing-resolver';
+import { NotificationsService } from '../notifications/notifications.service';
+import { WaitlistService, PAYMENT_TTL_MS } from '../waitlist/waitlist.service';
 import {
   decideCapacityOutcome,
   lockEventRow,
   sumActiveReservations,
 } from './capacity';
 
-const PAYMENT_TTL_MS = 30 * 60 * 1000;
-
 @Injectable()
 export class RegistrationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly events: EventsService,
+    private readonly notifications: NotificationsService,
+    private readonly waitlist: WaitlistService,
   ) {}
 
   private serializeRegistration(
@@ -46,7 +48,7 @@ export class RegistrationsService {
       currency: string;
       expiresAt: Date | null;
     },
-    extra?: { waitlistPosition?: number },
+    extra?: { waitlistPosition?: number; rejectionReason?: string | null },
   ) {
     const unit = moneyString(reg.priceSnapshot);
     const base = {
@@ -61,6 +63,9 @@ export class RegistrationsService {
     };
     if (extra?.waitlistPosition !== undefined) {
       return { ...base, waitlistPosition: extra.waitlistPosition };
+    }
+    if (extra?.rejectionReason !== undefined) {
+      return { ...base, rejectionReason: extra.rejectionReason };
     }
     return base;
   }
@@ -133,7 +138,6 @@ export class RegistrationsService {
           );
         }
 
-        // Resolve guest linked users
         const guestCreates: Prisma.RegistrationGuestCreateWithoutRegistrationInput[] =
           [];
         for (const g of guests) {
@@ -207,7 +211,6 @@ export class RegistrationsService {
           });
         }
 
-        // decision.kind === 'ok'
         const status = event.approvalRequired
           ? RegistrationStatus.PENDING_APPROVAL
           : RegistrationStatus.PENDING_PAYMENT;
@@ -230,8 +233,6 @@ export class RegistrationsService {
           },
         });
 
-        // Capacity held for PENDING_PAYMENT (APPROVED/CONFIRMED arrive via later milestones).
-        // PENDING_APPROVAL does not reserve until approved (M7).
         if (status === RegistrationStatus.PENDING_PAYMENT) {
           await tx.capacityReservation.create({
             data: {
@@ -262,6 +263,151 @@ export class RegistrationsService {
       }
       throw err;
     }
+  }
+
+  async approve(user: AuthUser, registrationId: string) {
+    const reg = await this.prisma.eventRegistration.findUnique({
+      where: { id: registrationId },
+      include: { event: true },
+    });
+    if (!reg) throw new NotFoundException('Registration not found');
+    if (!canManageEvent(user, reg.event.organizerId)) {
+      throw new ForbiddenException('Not allowed to approve this registration');
+    }
+    if (reg.status !== RegistrationStatus.PENDING_APPROVAL) {
+      throw new UnprocessableEntityException(
+        'Registration is not pending approval',
+      );
+    }
+
+    const result = await this.prisma.$transaction(async (tx) => {
+      const locked = await lockEventRow(tx, reg.eventId);
+      if (!locked) throw new NotFoundException('Event not found');
+
+      const used = await sumActiveReservations(tx, reg.eventId);
+      const decision = decideCapacityOutcome(
+        locked.capacity,
+        used,
+        reg.peopleCount,
+      );
+
+      const decidedAt = new Date();
+
+      if (decision.kind === 'ok') {
+        const expiresAt = new Date(Date.now() + PAYMENT_TTL_MS);
+        const updated = await tx.eventRegistration.update({
+          where: { id: registrationId },
+          data: {
+            status: RegistrationStatus.PENDING_PAYMENT,
+            approvalDecidedByUserId: user.id,
+            approvalDecidedAt: decidedAt,
+            expiresAt,
+          },
+        });
+        await tx.capacityReservation.create({
+          data: {
+            eventId: reg.eventId,
+            registrationId: reg.id,
+            peopleCount: reg.peopleCount,
+            status: CapacityReservationStatus.ACTIVE,
+          },
+        });
+        const newUsed = used + reg.peopleCount;
+        if (newUsed >= locked.capacity) {
+          await tx.event.update({
+            where: { id: reg.eventId },
+            data: { status: EventStatus.FULL },
+          });
+        }
+        return {
+          reg: updated,
+          waitlistPosition: undefined as number | undefined,
+        };
+      }
+
+      const positionAgg = await tx.waitlistEntry.aggregate({
+        where: {
+          eventId: reg.eventId,
+          status: WaitlistStatus.JOINED,
+        },
+        _max: { position: true },
+      });
+      const position = (positionAgg._max.position ?? 0) + 1;
+
+      const updated = await tx.eventRegistration.update({
+        where: { id: registrationId },
+        data: {
+          status: RegistrationStatus.WAITLISTED,
+          approvalDecidedByUserId: user.id,
+          approvalDecidedAt: decidedAt,
+        },
+      });
+      await tx.waitlistEntry.create({
+        data: {
+          eventId: reg.eventId,
+          userId: reg.primaryUserId,
+          peopleCount: reg.peopleCount,
+          position,
+          status: WaitlistStatus.JOINED,
+        },
+      });
+      if (locked.capacity <= used) {
+        await tx.event.update({
+          where: { id: reg.eventId },
+          data: { status: EventStatus.FULL },
+        });
+      }
+      return { reg: updated, waitlistPosition: position };
+    });
+
+    await this.notifications.enqueue({
+      recipientUserId: reg.primaryUserId,
+      type: 'registration.approved',
+      entityType: 'EventRegistration',
+      entityId: registrationId,
+      dedupeKey: `registration:${registrationId}:approved`,
+    });
+
+    return this.serializeRegistration(result.reg, {
+      waitlistPosition: result.waitlistPosition,
+    });
+  }
+
+  async reject(user: AuthUser, registrationId: string, reason?: string) {
+    const reg = await this.prisma.eventRegistration.findUnique({
+      where: { id: registrationId },
+      include: { event: true },
+    });
+    if (!reg) throw new NotFoundException('Registration not found');
+    if (!canManageEvent(user, reg.event.organizerId)) {
+      throw new ForbiddenException('Not allowed to reject this registration');
+    }
+    if (reg.status !== RegistrationStatus.PENDING_APPROVAL) {
+      throw new UnprocessableEntityException(
+        'Registration is not pending approval',
+      );
+    }
+
+    const updated = await this.prisma.eventRegistration.update({
+      where: { id: registrationId },
+      data: {
+        status: RegistrationStatus.REJECTED,
+        approvalDecidedByUserId: user.id,
+        approvalDecidedAt: new Date(),
+      },
+    });
+
+    await this.notifications.enqueue({
+      recipientUserId: reg.primaryUserId,
+      type: 'registration.rejected',
+      entityType: 'EventRegistration',
+      entityId: registrationId,
+      dedupeKey: `registration:${registrationId}:rejected`,
+    });
+
+    return this.serializeRegistration(updated, {
+      rejectionReason: reason ?? null,
+    });
   }
 
   async requestCapacityOverride(
@@ -306,9 +452,6 @@ export class RegistrationsService {
     return { id: req.id, status: req.status };
   }
 
-  /**
-   * D9: grant extra seats scoped to this registration only (may exceed event capacity).
-   */
   async approveCapacityOverride(user: AuthUser, requestId: string) {
     const request = await this.prisma.capacityOverrideRequest.findUnique({
       where: { id: requestId },
@@ -335,19 +478,15 @@ export class RegistrationsService {
       const extra = request.requestedExtraPeople;
       const newPeople = reg.peopleCount + extra;
 
-      if (newPeople > event.maxPeoplePerRegistration) {
-        // D9 scoped override may exceed maxPeoplePerRegistration intentionally —
-        // still enforce hard ceiling of max*2 as sanity, else allow organizer grant.
-        // Spec: scoped to requester beyond remaining — allow past maxPeople with organizer approval.
-      }
-
       await tx.eventRegistration.update({
         where: { id: reg.id },
         data: { peopleCount: newPeople },
       });
 
       if (reg.capacityReservation) {
-        if (reg.capacityReservation.status === CapacityReservationStatus.ACTIVE) {
+        if (
+          reg.capacityReservation.status === CapacityReservationStatus.ACTIVE
+        ) {
           await tx.capacityReservation.update({
             where: { id: reg.capacityReservation.id },
             data: { peopleCount: newPeople },
@@ -408,11 +547,13 @@ export class RegistrationsService {
       RegistrationStatus.WAITLISTED,
     ];
     if (isOwner && !isManager && !ownerCancellable.includes(reg.status)) {
-      // Pre-payment only for owners (post-payment is Phase 2 refund)
       throw new UnprocessableEntityException(
         'Owners may only cancel pre-payment registrations',
       );
     }
+
+    const hadActiveReservation =
+      reg.capacityReservation?.status === CapacityReservationStatus.ACTIVE;
 
     const updated = await this.prisma.$transaction(async (tx) => {
       await lockEventRow(tx, reg.eventId);
@@ -435,7 +576,9 @@ export class RegistrationsService {
           where: {
             eventId: reg.eventId,
             userId: reg.primaryUserId,
-            status: WaitlistStatus.JOINED,
+            status: {
+              in: [WaitlistStatus.JOINED, WaitlistStatus.OFFERED],
+            },
           },
           data: { status: WaitlistStatus.LEFT },
         });
@@ -446,7 +589,6 @@ export class RegistrationsService {
         data: { status: RegistrationStatus.CANCELLED },
       });
 
-      // Recompute OPEN if was FULL
       if (reg.event.status === EventStatus.FULL) {
         const used = await sumActiveReservations(tx, reg.eventId);
         if (used < reg.event.capacity) {
@@ -459,6 +601,10 @@ export class RegistrationsService {
 
       return next;
     });
+
+    if (hadActiveReservation) {
+      await this.waitlist.onCapacityFreed(reg.eventId);
+    }
 
     return this.serializeRegistration(updated);
   }

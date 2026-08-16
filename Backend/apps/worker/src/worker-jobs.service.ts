@@ -1,5 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import {
+  EventRemindersService,
   NotificationsService,
   PaymentsService,
   WaitlistService,
@@ -8,8 +9,8 @@ import {
 const TICK_MS = 15_000;
 
 /**
- * Minimal worker loop: waitlist offer expiry, payment expiry, notification dispatch.
- * BullMQ/Redis wiring deferred when Redis is unavailable — setInterval reconcile is enough for M8–M11.
+ * Minimal worker loop: waitlist offer expiry, payment expiry, notification dispatch, reminders.
+ * BullMQ/Redis wiring deferred when Redis is unavailable — setInterval reconcile is enough for M8–M15.
  */
 @Injectable()
 export class WorkerJobsService implements OnModuleInit, OnModuleDestroy {
@@ -21,6 +22,7 @@ export class WorkerJobsService implements OnModuleInit, OnModuleDestroy {
     private readonly waitlist: WaitlistService,
     private readonly payments: PaymentsService,
     private readonly notifications: NotificationsService,
+    private readonly reminders: EventRemindersService,
   ) {}
 
   onModuleInit(): void {
@@ -42,9 +44,16 @@ export class WorkerJobsService implements OnModuleInit, OnModuleDestroy {
       const waitlist = await this.waitlist.reconcileExpiredOffers();
       const payments = await this.payments.expireStalePayments();
       const notes = await this.notifications.dispatchPending();
-      if (waitlist.expired || payments.expired || notes.sent || notes.failed) {
+      const reminders = await this.reminders.reconcileReminders();
+      if (
+        waitlist.expired ||
+        payments.expired ||
+        notes.sent ||
+        notes.failed ||
+        reminders.scheduled
+      ) {
         this.logger.log(
-          `tick waitlist.expired=${waitlist.expired} payments.expired=${payments.expired} notifications.sent=${notes.sent} failed=${notes.failed}`,
+          `tick waitlist.expired=${waitlist.expired} payments.expired=${payments.expired} notifications.sent=${notes.sent} failed=${notes.failed} reminders.scheduled=${reminders.scheduled}`,
         );
       }
     } catch (err) {
@@ -56,5 +65,3 @@ export class WorkerJobsService implements OnModuleInit, OnModuleDestroy {
     }
   }
 }
-
-/** Milestone 11: worker dispatch loop */

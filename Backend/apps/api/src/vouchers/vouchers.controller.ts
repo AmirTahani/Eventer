@@ -5,6 +5,8 @@ import {
   CurrentUser,
   InvitationsService,
   JwtAuthGuard,
+  RateLimit,
+  RateLimitGuard,
   Roles,
   RolesGuard,
   type AuthUser,
@@ -19,8 +21,9 @@ export class VouchersController {
 
   @Post('invitations')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, RateLimitGuard)
   @Roles('VOUCHER', 'ADMIN')
+  @RateLimit({ name: 'invitation-create', limit: 20, windowMs: 60_000 })
   create(
     @CurrentUser() user: AuthUser,
     @Body() body: CreateInvitationDto,

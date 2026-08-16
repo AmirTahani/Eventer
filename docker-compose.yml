@@ -25,6 +25,14 @@ services:
       timeout: 5s
       retries: 10
 
+  # Recommended prod/staging order:
+  #   1) build images
+  #   2) run `prisma migrate deploy` once against the target DB (CI job or one-shot)
+  #   3) roll out api / bot / worker / web
+  # Avoid N replicas all running migrate on boot. For a single-replica staging
+  # shortcut you may override api command to:
+  #   ./scripts/migrate-and-start.sh api
+
   api:
     build:
       context: ./Backend

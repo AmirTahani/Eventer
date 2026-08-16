@@ -32,6 +32,8 @@ export * from './waitlist/waitlist.module';
 export * from './waitlist/waitlist.service';
 export * from './payments/payments.module';
 export * from './payments/payments.service';
+export * from './payments/payment-provider';
+export * from './payments/orcarail.provider';
 export * from './tickets/tickets.module';
 export * from './tickets/tickets.service';
 export * from './checkin/checkin.module';

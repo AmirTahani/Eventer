@@ -43,7 +43,8 @@ export class PaymentsController {
   @HttpCode(200)
   handleWebhook(
     @Param('provider') provider: string,
-    @Headers('x-provider-signature') signature: string | undefined,
+    @Headers('x-webhook-signature') orcaSignature: string | undefined,
+    @Headers('x-provider-signature') mockSignature: string | undefined,
     @Body() body: unknown,
     @Req() req: Request & { rawBody?: string },
   ) {
@@ -54,6 +55,7 @@ export class PaymentsController {
         : typeof rawBuf === 'string'
           ? rawBuf
           : JSON.stringify(body);
+    const signature = orcaSignature ?? mockSignature;
     return this.payments.handleWebhook(provider, raw, signature, body);
   }
 }

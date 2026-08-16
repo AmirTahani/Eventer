@@ -34,6 +34,23 @@ pnpm dev               # http://localhost:3001
 
 Full app stack via Compose: `docker compose --profile full up --build`
 
+## Payments (OrcaRail)
+
+Eventer supports `PAYMENT_PROVIDER=mock` (default) or `PAYMENT_PROVIDER=orcarail`.
+
+1. Copy `Backend/.env.example` → `.env` and set:
+   - `PAYMENT_PROVIDER=orcarail`
+   - `ORCARAIL_API_KEY` / `ORCARAIL_API_SECRET`
+   - `ORCARAIL_TOKEN_ID` / `ORCARAIL_NETWORK_ID` (catalog UUIDs from OrcaRail)
+   - `ORCARAIL_RETURN_URL` / `ORCARAIL_CANCEL_URL` (e.g. `http://localhost:3001/payments/return` and `.../cancel`)
+   - `ORCARAIL_WEBHOOK_SECRET` (dashboard webhook secret, or your API secret)
+2. In the OrcaRail dashboard, point the webhook URL to  
+   `https://<your-eventer-api>/payments/webhook/orcarail`  
+   (signature header: `x-webhook-signature`).
+3. **Self-hosted OrcaRail:** set `ORCARAIL_BASE_URL=https://your-orcarail-host/api/v1` — no code changes required.
+
+Checkout flow: create intent → confirm → open hosted `pay_url` (Telegram bot sends a Pay button; Frontend has return/cancel pages). Ticket issuance stays webhook-driven (`payment_intent.completed`).
+
 ## Production checklist
 
 Derived from `12-deployment-observability.md`:

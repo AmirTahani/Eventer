@@ -28,6 +28,7 @@ import {
   MockPaymentProvider,
   PaymentProvider,
 } from './payment-provider';
+import { OrcaRailPaymentProvider } from './orcarail.provider';
 
 @Injectable()
 export class PaymentsService {
@@ -41,10 +42,45 @@ export class PaymentsService {
     private readonly notifications: NotificationsService,
     private readonly waitlist: WaitlistService,
   ) {
-    this.provider = new MockPaymentProvider();
+    this.provider = this.createProvider();
+  }
+
+  private createProvider(): PaymentProvider {
+    const name = this.config.get<string>('PAYMENT_PROVIDER') ?? 'mock';
+    if (name === 'orcarail') {
+      const apiKey = this.config.get<string>('ORCARAIL_API_KEY');
+      const apiSecret = this.config.get<string>('ORCARAIL_API_SECRET');
+      const tokenId = this.config.get<string>('ORCARAIL_TOKEN_ID');
+      const networkId = this.config.get<string>('ORCARAIL_NETWORK_ID');
+      const returnUrl = this.config.get<string>('ORCARAIL_RETURN_URL');
+      if (!apiKey || !apiSecret || !tokenId || !networkId || !returnUrl) {
+        throw new Error(
+          'OrcaRail payment provider requires ORCARAIL_API_KEY, ORCARAIL_API_SECRET, ORCARAIL_TOKEN_ID, ORCARAIL_NETWORK_ID, and ORCARAIL_RETURN_URL',
+        );
+      }
+      return new OrcaRailPaymentProvider({
+        apiKey,
+        apiSecret,
+        baseUrl:
+          this.config.get<string>('ORCARAIL_BASE_URL') ??
+          'https://api.orcarail.com/api/v1',
+        tokenId,
+        networkId,
+        returnUrl,
+        cancelUrl: this.config.get<string>('ORCARAIL_CANCEL_URL'),
+      });
+    }
+    return new MockPaymentProvider();
   }
 
   private webhookSecret(): string {
+    if (this.provider.name === 'orcarail') {
+      return (
+        this.config.get<string>('ORCARAIL_WEBHOOK_SECRET') ??
+        this.config.get<string>('PAYMENT_WEBHOOK_SECRET') ??
+        'dev-payment-webhook-secret'
+      );
+    }
     return (
       this.config.get<string>('PAYMENT_WEBHOOK_SECRET') ??
       'dev-payment-webhook-secret'

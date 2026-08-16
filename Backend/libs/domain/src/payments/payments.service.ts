@@ -116,6 +116,10 @@ export class PaymentsService {
         currency: reg.currency,
         registrationId: reg.id,
       });
+      await this.prisma.payment.update({
+        where: { id: last.id },
+        data: { providerTransactionId: checkout.providerTransactionId },
+      });
       return {
         paymentId: last.id,
         provider: checkout.provider,

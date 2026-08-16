@@ -2,37 +2,18 @@
 
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import {
+  PaymentReturnView,
+  resolvePaymentIntentId,
+} from '../payment-status';
 
 function ReturnContent() {
   const params = useSearchParams();
-  const paymentIntent =
-    params.get('payment_intent') ?? params.get('paymentIntent') ?? null;
-
   return (
-    <Stack spacing={2}>
-      <Typography
-        variant="h4"
-        sx={{ fontFamily: '"Playfair Display", serif' }}
-      >
-        Payment received
-      </Typography>
-      <Typography color="text.secondary">
-        Thanks — we are confirming your payment on-chain. Your tickets will
-        appear once the webhook settles (usually within a minute).
-      </Typography>
-      {paymentIntent ? (
-        <Alert severity="info">Payment intent: {paymentIntent}</Alert>
-      ) : (
-        <Alert severity="success">
-          You can close this page and return to Telegram or the dashboard.
-        </Alert>
-      )}
-    </Stack>
+    <PaymentReturnView paymentIntent={resolvePaymentIntentId((k) => params.get(k))} />
   );
 }
 

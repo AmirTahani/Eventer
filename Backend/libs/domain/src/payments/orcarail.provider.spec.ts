@@ -4,6 +4,18 @@ import {
   OrcaRailPaymentProvider,
 } from './orcarail.provider';
 
+function buildProvider() {
+  return new OrcaRailPaymentProvider({
+    apiKey: 'ak_test',
+    apiSecret: 'sk_test',
+    baseUrl: 'https://api.orcarail.test/api/v1',
+    tokenId: 'token-uuid',
+    networkId: 'network-uuid',
+    returnUrl: 'http://localhost:3001/payments/return',
+    cancelUrl: 'http://localhost:3001/payments/cancel',
+  });
+}
+
 describe('mapOrcaRailWebhook', () => {
   it('maps payment_intent.completed to succeeded', () => {
     const payload = mapOrcaRailWebhook({
@@ -41,6 +53,13 @@ describe('mapOrcaRailWebhook', () => {
     expect(payload.transactionId).toBe('pi_old');
   });
 
+  it('maps completed object status without type to succeeded', () => {
+    const payload = mapOrcaRailWebhook({
+      data: { object: { id: 'pi_status', status: 'completed' } },
+    });
+    expect(payload.status).toBe('succeeded');
+  });
+
   it('maps payment_intent.processing', () => {
     const payload = mapOrcaRailWebhook({
       type: 'payment_intent.processing',
@@ -66,18 +85,47 @@ describe('mapOrcaRailWebhook', () => {
     });
     expect(payload.status).toBe('failed');
   });
+
+  it('coerces numeric amounts and ignores non-string paymentId', () => {
+    const payload = mapOrcaRailWebhook({
+      type: 'payment_intent.completed',
+      data: {
+        object: {
+          id: 'pi_num',
+          amount: 10,
+          currency: 'USD',
+          metadata: { paymentId: 99 },
+        },
+      },
+    });
+    expect(payload.amount).toBe('10');
+    expect(payload.metadata?.paymentId).toBeUndefined();
+  });
+
+  it('handles null/empty bodies safely', () => {
+    expect(mapOrcaRailWebhook(null)).toEqual({
+      transactionId: '',
+      status: 'failed',
+      amount: undefined,
+      currency: undefined,
+      metadata: { paymentId: undefined },
+    });
+    expect(mapOrcaRailWebhook(undefined).transactionId).toBe('');
+  });
+
+  it('parseWebhook delegates to mapOrcaRailWebhook', () => {
+    const provider = buildProvider();
+    const body = {
+      type: 'payment_intent.processing',
+      data: { object: { id: 'pi_x' } },
+    };
+    expect(provider.parseWebhook(body)).toEqual(mapOrcaRailWebhook(body));
+  });
 });
 
 describe('OrcaRailPaymentProvider.verifyWebhookSignature', () => {
   it('accepts a valid HMAC with the configured secret', () => {
-    const provider = new OrcaRailPaymentProvider({
-      apiKey: 'ak_test',
-      apiSecret: 'sk_test',
-      baseUrl: 'https://api.orcarail.com/api/v1',
-      tokenId: 'token-uuid',
-      networkId: 'network-uuid',
-      returnUrl: 'http://localhost:3001/payments/return',
-    });
+    const provider = buildProvider();
     const secret = 'whsec_test';
     const body = JSON.stringify({
       type: 'payment_intent.completed',
@@ -89,5 +137,142 @@ describe('OrcaRailPaymentProvider.verifyWebhookSignature', () => {
     expect(provider.verifyWebhookSignature(body, undefined, secret)).toBe(
       false,
     );
+  });
+});
+
+describe('OrcaRailPaymentProvider.createIntent', () => {
+  it('creates, confirms, and returns pay_url checkout', async () => {
+    const provider = buildProvider();
+    const client = (
+      provider as unknown as {
+        client: {
+          paymentIntents: {
+            create: jest.Mock;
+            confirm: jest.Mock;
+          };
+        };
+      }
+    ).client;
+
+    client.paymentIntents.create = jest.fn().mockResolvedValue({
+      id: 'pi_1',
+      client_secret: 'cs_test',
+    });
+    client.paymentIntents.confirm = jest.fn().mockResolvedValue({
+      id: 'pi_1',
+      pay_url: 'https://pay.orcarail.test/pi_1',
+    });
+
+    const result = await provider.createIntent({
+      paymentId: 'pay-1',
+      amount: '25.00',
+      currency: 'USD',
+      registrationId: 'reg-1',
+    });
+
+    expect(client.paymentIntents.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        amount: '25.00',
+        currency: 'usd',
+        tokenId: 'token-uuid',
+        networkId: 'network-uuid',
+        return_url: 'http://localhost:3001/payments/return',
+        cancel_url: 'http://localhost:3001/payments/cancel',
+        metadata: { paymentId: 'pay-1', registrationId: 'reg-1' },
+      }),
+    );
+    expect(client.paymentIntents.confirm).toHaveBeenCalledWith('pi_1', {
+      client_secret: 'cs_test',
+      return_url: 'http://localhost:3001/payments/return',
+    });
+    expect(result).toEqual({
+      provider: 'orcarail',
+      providerTransactionId: 'pi_1',
+      checkoutUrl: 'https://pay.orcarail.test/pi_1',
+    });
+  });
+
+  it('falls back to payment_link.link then nextAction URL', async () => {
+    const provider = buildProvider();
+    const client = (
+      provider as unknown as {
+        client: {
+          paymentIntents: { create: jest.Mock; confirm: jest.Mock };
+        };
+      }
+    ).client;
+
+    client.paymentIntents.create = jest.fn().mockResolvedValue({
+      id: 'pi_2',
+      client_secret: 'cs_2',
+    });
+    client.paymentIntents.confirm = jest.fn().mockResolvedValue({
+      id: 'pi_2',
+      payment_link: { link: 'https://pay.orcarail.test/link' },
+    });
+    await expect(
+      provider.createIntent({
+        paymentId: 'p',
+        amount: '1.00',
+        currency: 'eur',
+        registrationId: 'r',
+      }),
+    ).resolves.toMatchObject({
+      checkoutUrl: 'https://pay.orcarail.test/link',
+    });
+
+    client.paymentIntents.confirm = jest.fn().mockResolvedValue({
+      id: 'pi_3',
+      nextAction: { redirectToUrl: { url: 'https://pay.orcarail.test/next' } },
+    });
+    await expect(
+      provider.createIntent({
+        paymentId: 'p',
+        amount: '1.00',
+        currency: 'eur',
+        registrationId: 'r',
+      }),
+    ).resolves.toMatchObject({
+      checkoutUrl: 'https://pay.orcarail.test/next',
+    });
+  });
+
+  it('throws when client_secret or pay URL is missing', async () => {
+    const provider = buildProvider();
+    const client = (
+      provider as unknown as {
+        client: {
+          paymentIntents: { create: jest.Mock; confirm: jest.Mock };
+        };
+      }
+    ).client;
+
+    client.paymentIntents.create = jest.fn().mockResolvedValue({
+      id: 'pi_x',
+    });
+    await expect(
+      provider.createIntent({
+        paymentId: 'p',
+        amount: '1.00',
+        currency: 'usd',
+        registrationId: 'r',
+      }),
+    ).rejects.toThrow(/client_secret/);
+
+    client.paymentIntents.create = jest.fn().mockResolvedValue({
+      id: 'pi_y',
+      client_secret: 'cs',
+    });
+    client.paymentIntents.confirm = jest.fn().mockResolvedValue({
+      id: 'pi_y',
+    });
+    await expect(
+      provider.createIntent({
+        paymentId: 'p',
+        amount: '1.00',
+        currency: 'usd',
+        registrationId: 'r',
+      }),
+    ).rejects.toThrow(/hosted pay URL/);
   });
 });

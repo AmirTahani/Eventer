@@ -26,8 +26,10 @@ describe('verifyTelegramLoginHash', () => {
       auth_date: Math.floor(Date.now() / 1000),
     };
     const hash = signTelegramLoginPayload(base, botToken);
+    const tampered = 'ff'.repeat(32);
+    expect(tampered).not.toEqual(hash);
     const result = verifyTelegramLoginHash(
-      { ...base, hash: hash.replace(/0/g, '1').replace(/1/g, '0') },
+      { ...base, hash: tampered },
       botToken,
     );
     expect(result).toEqual({ ok: false, reason: 'invalid_hash' });

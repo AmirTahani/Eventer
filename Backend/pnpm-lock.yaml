@@ -32,6 +32,9 @@ importers:
       '@nestjs/terminus':
         specifier: ^11.1.1
         version: 11.1.1(@nestjs/common@11.2.1(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.1)(@prisma/client@6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3))(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@orcarail/node':
+        specifier: ^3.3.0
+        version: 3.3.0(@types/express@5.0.6)(@types/node@24.13.3)
       '@prisma/client':
         specifier: ^6.19.3
         version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
@@ -873,6 +876,18 @@ packages:
   '@noble/hashes@1.8.0':
     resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
     engines: {node: ^14.21.3 || >=16}
+
+  '@orcarail/node@3.3.0':
+    resolution: {integrity: sha512-tHQRAh3n1QTksatrXylfi7ST4dgjJsFwvjr41ctegSy+WOW2JZbAEgNmxU1Q8ctqyAuaI2PaXm9blXD1yixsig==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      '@types/express': ^4.17.0
+      '@types/node': ^18.0.0 || ^20.0.0
+    peerDependenciesMeta:
+      '@types/express':
+        optional: true
+      '@types/node':
+        optional: true
 
   '@paralleldrive/cuid2@2.3.1':
     resolution: {integrity: sha512-XO7cAxhnTZl0Yggq6jOgjiOHhbgcO4NqFqwSmQpjK3b6TEE6Uj/jfSk6wzYyemh3+I0sHirKSetjQwn5cZktFw==}
@@ -4321,6 +4336,11 @@ snapshots:
       '@nestjs/platform-express': 11.2.1(@nestjs/common@11.2.1(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.1)
 
   '@noble/hashes@1.8.0': {}
+
+  '@orcarail/node@3.3.0(@types/express@5.0.6)(@types/node@24.13.3)':
+    optionalDependencies:
+      '@types/express': 5.0.6
+      '@types/node': 24.13.3
 
   '@paralleldrive/cuid2@2.3.1':
     dependencies:

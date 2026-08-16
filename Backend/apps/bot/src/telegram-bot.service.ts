@@ -11,6 +11,7 @@ import type { Env } from '@eventer/common';
 import {
   EventsService,
   InvitationsService,
+  PaymentsService,
   RegistrationsService,
   TicketsService,
   UsersService,
@@ -42,6 +43,7 @@ export class TelegramBotService implements OnModuleInit, OnModuleDestroy {
     private readonly users: UsersService,
     private readonly events: EventsService,
     private readonly registrations: RegistrationsService,
+    private readonly payments: PaymentsService,
     private readonly tickets: TicketsService,
     private readonly prisma: PrismaService,
   ) {}
@@ -168,6 +170,15 @@ export class TelegramBotService implements OnModuleInit, OnModuleDestroy {
       await ctx.reply(PRIVATE_MSG);
     });
 
+    bot.callbackQuery('menu:main', async (ctx) => {
+      await ctx.answerCallbackQuery();
+      const auth = await this.requireAuth(ctx);
+      if (!auth) return;
+      await ctx.reply('Main menu', {
+        reply_markup: this.mainMenuKeyboard(auth.locale),
+      });
+    });
+
     bot.callbackQuery('menu:events', async (ctx) => {
       await ctx.answerCallbackQuery();
       const auth = await this.requireAuth(ctx);
@@ -291,15 +302,30 @@ export class TelegramBotService implements OnModuleInit, OnModuleDestroy {
           guests,
         });
         let extra = '';
+        let replyMarkup = this.mainMenuKeyboard(auth.locale);
         if (reg.status === 'PENDING_PAYMENT') {
-          extra =
-            '\nPay via the dashboard or payment link when available to confirm your spot.';
+          try {
+            const intent = await this.payments.createIntent(auth, reg.id);
+            extra = `\nComplete payment (${intent.amount} ${intent.currency}) to confirm your spot.`;
+            replyMarkup = new InlineKeyboard()
+              .url('Pay now', intent.checkoutUrl)
+              .row()
+              .text('Main menu', 'menu:main');
+          } catch (payErr) {
+            this.logger.warn(
+              `Payment intent failed for registration ${reg.id}: ${
+                payErr instanceof Error ? payErr.message : payErr
+              }`,
+            );
+            extra =
+              '\nPay via the dashboard payment link when available to confirm your spot.';
+          }
         } else if (reg.status === 'WAITLISTED') {
           extra = '\nYou are on the waitlist — we will notify you if a spot opens.';
         }
         await ctx.reply(
           `Registration created: ${reg.status} (${reg.peopleCount} people).${extra}`,
-          { reply_markup: this.mainMenuKeyboard(auth.locale) },
+          { reply_markup: replyMarkup },
         );
       } catch (err) {
         const message =

@@ -21,4 +21,40 @@ describe('validateEnv', () => {
       }),
     ).toThrow(/DATABASE_URL/);
   });
+
+  it('requires OrcaRail credentials when PAYMENT_PROVIDER=orcarail', () => {
+    expect(() =>
+      validateEnv({
+        DATABASE_URL: 'postgresql://eventer@localhost:5432/events',
+        PAYMENT_PROVIDER: 'orcarail',
+      }),
+    ).toThrow(/ORCARAIL_API_KEY/);
+  });
+
+  it('accepts a full orcarail config', () => {
+    const env = validateEnv({
+      DATABASE_URL: 'postgresql://eventer@localhost:5432/events',
+      PAYMENT_PROVIDER: 'orcarail',
+      ORCARAIL_API_KEY: 'ak_test',
+      ORCARAIL_API_SECRET: 'sk_test',
+      ORCARAIL_TOKEN_ID: 'token-usdc-uuid',
+      ORCARAIL_NETWORK_ID: 'network-polygon-uuid',
+      ORCARAIL_RETURN_URL: 'http://localhost:3001/payments/return',
+    });
+    expect(env.PAYMENT_PROVIDER).toBe('orcarail');
+    expect(env.ORCARAIL_BASE_URL).toBe('https://api.orcarail.com/api/v1');
+    expect(env.ORCARAIL_TOKEN_ID).toBe('token-usdc-uuid');
+  });
+
+  it('accepts blank OrcaRail fields when using mock provider', () => {
+    const env = validateEnv({
+      DATABASE_URL: 'postgresql://eventer@localhost:5432/events',
+      PAYMENT_PROVIDER: 'mock',
+      ORCARAIL_API_KEY: '',
+      ORCARAIL_TOKEN_ID: '',
+      ORCARAIL_RETURN_URL: '',
+    });
+    expect(env.PAYMENT_PROVIDER).toBe('mock');
+    expect(env.ORCARAIL_API_KEY).toBeUndefined();
+  });
 });

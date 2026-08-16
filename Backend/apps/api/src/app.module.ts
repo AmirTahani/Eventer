@@ -8,6 +8,7 @@ import { EventsController } from './events/events.controller';
 import { FilesController } from './files/files.controller';
 import { HealthModule } from './health/health.module';
 import { LocationsController } from './locations/locations.controller';
+import { RegistrationsController } from './registrations/registrations.controller';
 import { UsersController } from './users/users.controller';
 import { VouchersController } from './vouchers/vouchers.controller';
 
@@ -21,6 +22,7 @@ import { VouchersController } from './vouchers/vouchers.controller';
     LocationsController,
     FilesController,
     EventsController,
+    RegistrationsController,
   ],
 })
 export class AppModule {}

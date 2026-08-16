@@ -15,6 +15,7 @@ import {
   CurrentUser,
   EventsService,
   JwtAuthGuard,
+  RegistrationsService,
   Roles,
   RolesGuard,
   type AuthUser,
@@ -22,6 +23,7 @@ import {
 import { CancelEventDto } from './dto/cancel-event.dto';
 import { CreateAccessGrantDto } from './dto/create-access-grant.dto';
 import { CreateEventDto } from './dto/create-event.dto';
+import { CreateRegistrationDto } from './dto/create-registration.dto';
 import { ListEventsQueryDto } from './dto/list-events-query.dto';
 import { ReplacePricingTiersDto } from './dto/replace-pricing-tiers.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
@@ -31,7 +33,10 @@ import { UpdateEventDto } from './dto/update-event.dto';
 @Controller('events')
 @UseGuards(JwtAuthGuard)
 export class EventsController {
-  constructor(private readonly events: EventsService) {}
+  constructor(
+    private readonly events: EventsService,
+    private readonly registrations: RegistrationsService,
+  ) {}
 
   @Get()
   list(@CurrentUser() user: AuthUser, @Query() query: ListEventsQueryDto) {
@@ -97,6 +102,13 @@ export class EventsController {
     return this.events.cancel(user, id, body.reason);
   }
 
+  @Get(':id/access-grants')
+  @UseGuards(RolesGuard)
+  @Roles('ORGANIZER', 'ADMIN')
+  listGrants(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.events.listAccessGrants(user, id);
+  }
+
   @Post(':id/access-grants')
   @UseGuards(RolesGuard)
   @Roles('ORGANIZER', 'ADMIN')
@@ -117,5 +129,14 @@ export class EventsController {
     @Param('grantId') grantId: string,
   ) {
     return this.events.removeAccessGrant(user, id, grantId);
+  }
+
+  @Post(':id/registrations')
+  createRegistration(
+    @CurrentUser() user: AuthUser,
+    @Param('id') id: string,
+    @Body() body: CreateRegistrationDto,
+  ) {
+    return this.registrations.create(user, id, body);
   }
 }

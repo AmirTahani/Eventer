@@ -13,7 +13,9 @@ import {
 function CancelContent() {
   const params = useSearchParams();
   return (
-    <PaymentCancelView paymentIntent={resolvePaymentIntentId((k) => params.get(k))} />
+    <PaymentCancelView
+      paymentIntent={resolvePaymentIntentId((k) => params.get(k))}
+    />
   );
 }
 
@@ -25,11 +27,10 @@ export default function PaymentCancelPage() {
         display: 'grid',
         placeItems: 'center',
         px: 2,
-        background:
-          'radial-gradient(ellipse at top, #161F35 0%, #070B14 55%)',
+        py: 4,
       }}
     >
-      <Paper sx={{ p: 4, maxWidth: 480, width: '100%' }}>
+      <Paper sx={{ p: { xs: 3, sm: 4 }, maxWidth: 480, width: '100%' }}>
         <Suspense fallback={<Typography>Loading…</Typography>}>
           <CancelContent />
         </Suspense>

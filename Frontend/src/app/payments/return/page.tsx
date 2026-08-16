@@ -13,7 +13,9 @@ import {
 function ReturnContent() {
   const params = useSearchParams();
   return (
-    <PaymentReturnView paymentIntent={resolvePaymentIntentId((k) => params.get(k))} />
+    <PaymentReturnView
+      paymentIntent={resolvePaymentIntentId((k) => params.get(k))}
+    />
   );
 }
 
@@ -25,11 +27,10 @@ export default function PaymentReturnPage() {
         display: 'grid',
         placeItems: 'center',
         px: 2,
-        background:
-          'radial-gradient(ellipse at top, #161F35 0%, #070B14 55%)',
+        py: 4,
       }}
     >
-      <Paper sx={{ p: 4, maxWidth: 480, width: '100%' }}>
+      <Paper sx={{ p: { xs: 3, sm: 4 }, maxWidth: 480, width: '100%' }}>
         <Suspense fallback={<Typography>Loading…</Typography>}>
           <ReturnContent />
         </Suspense>

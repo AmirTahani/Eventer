@@ -29,15 +29,29 @@ export default function CreateEventPage() {
   const [visibility, setVisibility] = useState('ALL_APPROVED');
 
   return (
-    <Stack spacing={3} maxWidth={720}>
-      <Typography variant="h3">Create Event</Typography>
-      <Stepper activeStep={active} alternativeLabel>
-        {steps.map((label) => (
-          <Step key={label}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
+    <Stack spacing={3} maxWidth={720} width="100%">
+      <Typography
+        variant="h3"
+        sx={{ fontSize: { xs: '1.75rem', md: '2.25rem' } }}
+      >
+        Create Event
+      </Typography>
+      <Box sx={{ overflowX: 'auto', pb: 1 }}>
+        <Stepper
+          activeStep={active}
+          alternativeLabel
+          sx={{
+            minWidth: { xs: 640, md: 'auto' },
+            '& .MuiStepLabel-label': { typography: 'caption' },
+          }}
+        >
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+      </Box>
 
       <Box>
         {active === 0 && (
@@ -103,7 +117,11 @@ export default function CreateEventPage() {
         )}
       </Box>
 
-      <Stack direction="row" spacing={1}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={1}
+        sx={{ '& > *': { width: { xs: '100%', sm: 'auto' } } }}
+      >
         <Button disabled={active === 0} onClick={() => setActive((s) => s - 1)}>
           Back
         </Button>

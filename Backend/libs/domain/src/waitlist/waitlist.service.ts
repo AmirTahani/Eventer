@@ -321,3 +321,5 @@ export class WaitlistService {
     });
   }
 }
+
+/** Milestone 8: waitlist offer/claim/expire */

@@ -374,3 +374,5 @@ export class PaymentsService {
     });
   }
 }
+
+/** Milestone 9: mock payment provider + webhook idempotency */

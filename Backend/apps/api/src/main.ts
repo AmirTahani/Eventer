@@ -13,6 +13,8 @@ import {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: new StructuredLogger('API'),
+    // Required so payment webhook HMAC verifies the exact bytes received
+    rawBody: true,
   });
   app.use(cookieParser());
 

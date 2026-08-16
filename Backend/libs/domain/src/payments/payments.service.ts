@@ -231,6 +231,24 @@ export class PaymentsService {
         };
       }
 
+      const regStatus = payment.registration.status;
+      // Edge #5 / Payment-expiry race: never confirm after EXPIRED (capacity already released).
+      if (regStatus === RegistrationStatus.EXPIRED) {
+        await tx.payment.update({
+          where: { id: paymentId },
+          data: {
+            status: PaymentStatus.CANCELLED,
+            providerTransactionId,
+            rawProviderPayload: (rawPayload ??
+              Prisma.JsonNull) as Prisma.InputJsonValue,
+          },
+        });
+        return { rejectedExpired: true as const };
+      }
+      if (regStatus !== RegistrationStatus.PENDING_PAYMENT) {
+        return { rejectedStatus: regStatus };
+      }
+
       try {
         await tx.payment.update({
           where: { id: paymentId },
@@ -271,6 +289,12 @@ export class PaymentsService {
     });
 
     if (!outcome) return;
+    if ('rejectedExpired' in outcome || 'rejectedStatus' in outcome) {
+      this.logger.warn(
+        `Ignored payment confirm for ${paymentId}: registration not payable`,
+      );
+      return;
+    }
 
     await this.tickets.issueForRegistration(outcome.registrationId);
 

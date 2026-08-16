@@ -278,12 +278,27 @@ export class TelegramBotService implements OnModuleInit, OnModuleDestroy {
       if (!auth) return;
       const eventId = ctx.match![1]!;
       const peopleCount = ctx.session.peopleCount ?? 1;
+      const guests =
+        peopleCount > 1
+          ? Array.from({ length: peopleCount - 1 }, (_, i) => ({
+              firstName: `Guest`,
+              lastName: String(i + 1),
+            }))
+          : [];
       try {
         const reg = await this.registrations.create(auth, eventId, {
           peopleCount,
+          guests,
         });
+        let extra = '';
+        if (reg.status === 'PENDING_PAYMENT') {
+          extra =
+            '\nPay via the dashboard or payment link when available to confirm your spot.';
+        } else if (reg.status === 'WAITLISTED') {
+          extra = '\nYou are on the waitlist — we will notify you if a spot opens.';
+        }
         await ctx.reply(
-          `Registration created: ${reg.status} (${reg.peopleCount} people).`,
+          `Registration created: ${reg.status} (${reg.peopleCount} people).${extra}`,
           { reply_markup: this.mainMenuKeyboard(auth.locale) },
         );
       } catch (err) {

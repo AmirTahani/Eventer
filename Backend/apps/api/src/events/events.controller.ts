@@ -86,6 +86,13 @@ export class EventsController {
     return this.events.publish(user, id);
   }
 
+  @Post(':id/close')
+  @UseGuards(RolesGuard)
+  @Roles('ORGANIZER', 'ADMIN')
+  close(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.events.close(user, id);
+  }
+
   @Post(':id/release-location')
   @UseGuards(RolesGuard)
   @Roles('ORGANIZER', 'ADMIN')

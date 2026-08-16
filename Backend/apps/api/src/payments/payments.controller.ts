@@ -47,8 +47,13 @@ export class PaymentsController {
     @Body() body: unknown,
     @Req() req: Request & { rawBody?: string },
   ) {
+    const rawBuf = (req as Request & { rawBody?: Buffer }).rawBody;
     const raw =
-      typeof req.rawBody === 'string' ? req.rawBody : JSON.stringify(body);
+      Buffer.isBuffer(rawBuf)
+        ? rawBuf.toString('utf8')
+        : typeof rawBuf === 'string'
+          ? rawBuf
+          : JSON.stringify(body);
     return this.payments.handleWebhook(provider, raw, signature, body);
   }
 }

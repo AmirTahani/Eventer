@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import {
   EventRemindersService,
+  EventsService,
   NotificationsService,
   PaymentsService,
   WaitlistService,
@@ -9,8 +10,8 @@ import {
 const TICK_MS = 15_000;
 
 /**
- * Minimal worker loop: waitlist offer expiry, payment expiry, notification dispatch, reminders.
- * BullMQ/Redis wiring deferred when Redis is unavailable — setInterval reconcile is enough for M8–M15.
+ * Minimal worker loop: waitlist offer expiry, payment expiry, notification dispatch,
+ * reminders, and event COMPLETED transitions.
  */
 @Injectable()
 export class WorkerJobsService implements OnModuleInit, OnModuleDestroy {
@@ -23,6 +24,7 @@ export class WorkerJobsService implements OnModuleInit, OnModuleDestroy {
     private readonly payments: PaymentsService,
     private readonly notifications: NotificationsService,
     private readonly reminders: EventRemindersService,
+    private readonly events: EventsService,
   ) {}
 
   onModuleInit(): void {
@@ -45,15 +47,17 @@ export class WorkerJobsService implements OnModuleInit, OnModuleDestroy {
       const payments = await this.payments.expireStalePayments();
       const notes = await this.notifications.dispatchPending();
       const reminders = await this.reminders.reconcileReminders();
+      const completed = await this.events.markCompletedEvents();
       if (
         waitlist.expired ||
         payments.expired ||
         notes.sent ||
         notes.failed ||
-        reminders.scheduled
+        reminders.scheduled ||
+        completed.completed
       ) {
         this.logger.log(
-          `tick waitlist.expired=${waitlist.expired} payments.expired=${payments.expired} notifications.sent=${notes.sent} failed=${notes.failed} reminders.scheduled=${reminders.scheduled}`,
+          `tick waitlist.expired=${waitlist.expired} payments.expired=${payments.expired} notifications.sent=${notes.sent} failed=${notes.failed} reminders.scheduled=${reminders.scheduled} events.completed=${completed.completed}`,
         );
       }
     } catch (err) {

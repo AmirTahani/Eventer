@@ -131,7 +131,10 @@ export class TicketsService {
         eventName: t.registration.event.name,
         holderType: t.holderType,
         status: t.status,
-        qrImageUrl: `/tickets/${t.id}/qr.png`,
+        qrTokenPresent: true,
+        // Opaque QR image rendering is client-side from a signed scan endpoint;
+        // never return the raw qrToken in list payloads.
+        qrImageHint: 'Use organizer check-in scan with the ticket QR token',
       })),
     };
   }

@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   NotificationChannel,
   NotificationStatus,
@@ -19,7 +20,10 @@ export type EnqueueNotificationInput = {
 export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService,
+  ) {}
 
   /**
    * Idempotent enqueue via unique `dedupeKey`. Duplicate keys are ignored.
@@ -63,26 +67,91 @@ export class NotificationsService {
     return created;
   }
 
+  private botToken(): string | undefined {
+    const token = this.config.get<string>('TELEGRAM_BOT_TOKEN');
+    if (!token || token === 'dev-bot-token-for-local-tests') return undefined;
+    return token;
+  }
+
+  private async sendTelegramMessage(
+    telegramUserId: bigint,
+    text: string,
+  ): Promise<string | null> {
+    const token = this.botToken();
+    if (!token) return null;
+
+    const res = await fetch(
+      `https://api.telegram.org/bot${token}/sendMessage`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: telegramUserId.toString(),
+          text,
+        }),
+      },
+    );
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Telegram API ${res.status}: ${body}`);
+    }
+    const json = (await res.json()) as {
+      result?: { message_id?: number };
+    };
+    return json.result?.message_id?.toString() ?? 'ok';
+  }
+
   /**
-   * Worker entry: mark PENDING notifications SENT (or FAILED after 3 attempts).
-   * Real Telegram send is stubbed — if no bot token, still mark SENT after logging.
+   * Worker entry: deliver PENDING notifications via Telegram when a bot token
+   * is configured; otherwise leave PENDING with an attempt note (do not fake SENT).
    */
   async dispatchPending(limit = 50): Promise<{ sent: number; failed: number }> {
     const pending = await this.prisma.notification.findMany({
       where: { status: NotificationStatus.PENDING },
       orderBy: { createdAt: 'asc' },
       take: limit,
+      include: { recipient: true },
     });
 
     let sent = 0;
     let failed = 0;
+    const token = this.botToken();
 
     for (const n of pending) {
       const attempts = n.attempts + 1;
       try {
-        // Stub delivery — TelegramDeliveryWorker calls this path.
-        this.logger.log(
-          `[telegram-stub] type=${n.type} recipient=${n.recipientUserId} entity=${n.entityType}:${n.entityId}`,
+        if (!token) {
+          // No real delivery channel — stay PENDING so organizers can see backlog;
+          // cap attempts so we don't spin forever without a token.
+          if (attempts >= 3) {
+            await this.prisma.notification.update({
+              where: { id: n.id },
+              data: {
+                attempts,
+                status: NotificationStatus.FAILED,
+                error: 'TELEGRAM_BOT_TOKEN not configured',
+              },
+            });
+            failed += 1;
+          } else {
+            await this.prisma.notification.update({
+              where: { id: n.id },
+              data: {
+                attempts,
+                error: 'waiting for TELEGRAM_BOT_TOKEN',
+              },
+            });
+            this.logger.warn(
+              `[telegram] skipped ${n.type} — bot token not configured`,
+            );
+          }
+          continue;
+        }
+
+        const text = `Eventer: ${n.type} (${n.entityType} ${n.entityId})`;
+        const messageId = await this.sendTelegramMessage(
+          n.recipient.telegramUserId,
+          text,
         );
         await this.prisma.notification.update({
           where: { id: n.id },
@@ -90,7 +159,7 @@ export class NotificationsService {
             status: NotificationStatus.SENT,
             attempts,
             sentAt: new Date(),
-            providerMessageId: `stub-${n.id}`,
+            providerMessageId: messageId,
             error: null,
           },
         });

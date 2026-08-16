@@ -1,8 +1,10 @@
 import {
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
+  forwardRef,
 } from '@nestjs/common';
 import {
   CapacityReservationStatus,
@@ -22,6 +24,7 @@ import { DjsService } from '../djs/djs.service';
 import { FilesService } from '../files/files.service';
 import { LocationsService } from '../locations/locations.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { WaitlistService } from '../waitlist/waitlist.service';
 import { EventVisibilityService } from './event-visibility.service';
 import {
   resolveActivePrice,
@@ -29,7 +32,7 @@ import {
   validatePricingTiersInput,
 } from './pricing-resolver';
 
-const eventDetailInclude = {
+const eventDetailIncludeBase = {
   eventDJs: {
     include: {
       dj: true,
@@ -38,10 +41,19 @@ const eventDetailInclude = {
   },
   pricingTiers: { orderBy: { startsAt: 'asc' as const } },
   accessGrants: true,
-  location: true,
 } satisfies Prisma.EventInclude;
 
-type EventDetail = Prisma.EventGetPayload<{ include: typeof eventDetailInclude }>;
+/** Include location only when the requester is authorized (§3.7 query-level). */
+function eventDetailInclude(withLocation: boolean) {
+  return {
+    ...eventDetailIncludeBase,
+    location: withLocation,
+  } satisfies Prisma.EventInclude;
+}
+
+type EventDetail = Prisma.EventGetPayload<{
+  include: ReturnType<typeof eventDetailInclude>;
+}>;
 
 @Injectable()
 export class EventsService {
@@ -53,6 +65,8 @@ export class EventsService {
     private readonly files: FilesService,
     private readonly notifications: NotificationsService,
     private readonly audit: AuditService,
+    @Inject(forwardRef(() => WaitlistService))
+    private readonly waitlist: WaitlistService,
   ) {}
 
   private assertCanManage(user: AuthUser, organizerId: string) {
@@ -203,7 +217,10 @@ export class EventsService {
           : null,
       locationReleased: !!event.locationReleasedAt,
       locationReleasedAt: event.locationReleasedAt?.toISOString() ?? null,
-      locationId: event.locationId,
+      // Never expose locationId to attendees — only managers need it for editing.
+      ...(canManageEvent(user, event.organizerId)
+        ? { locationId: event.locationId }
+        : {}),
       organizerId: event.organizerId,
       notifyOnEditDefault: event.notifyOnEditDefault,
       createdAt: event.createdAt.toISOString(),
@@ -308,7 +325,7 @@ export class EventsService {
             }
           : undefined,
       },
-      include: eventDetailInclude,
+      include: eventDetailInclude(true),
     });
 
     const remaining = await this.remainingCapacity(event.id, event.capacity);
@@ -349,7 +366,7 @@ export class EventsService {
 
     const items = await this.prisma.event.findMany({
       where,
-      include: eventDetailInclude,
+      include: eventDetailInclude(true),
       orderBy: [{ startAt: 'asc' }, { id: 'asc' }],
       take: limit + 1,
       ...(cursor
@@ -378,14 +395,23 @@ export class EventsService {
   }
 
   async getById(user: AuthUser, id: string) {
-    const event = await this.prisma.event.findFirst({
+    // Visibility check first without location, then re-fetch with location only if authorized (§3.7).
+    const head = await this.prisma.event.findFirst({
       where: { id, deletedAt: null },
-      include: eventDetailInclude,
+      include: eventDetailInclude(false),
     });
-    if (!event) throw new NotFoundException('Event not found');
+    if (!head) throw new NotFoundException('Event not found');
 
-    const allowed = await this.visibility.canSeeEvent(user, event);
+    const allowed = await this.visibility.canSeeEvent(user, head);
     if (!allowed) throw new NotFoundException('Event not found');
+
+    const showLocation = await this.canSeeLocation(user, id);
+    const event = showLocation
+      ? await this.prisma.event.findFirstOrThrow({
+          where: { id, deletedAt: null },
+          include: eventDetailInclude(true),
+        })
+      : head;
 
     const remaining = await this.remainingCapacity(event.id, event.capacity);
     return this.serializeDetail(user, event, remaining);
@@ -395,7 +421,7 @@ export class EventsService {
   async requireManagedEvent(user: AuthUser, id: string) {
     const event = await this.prisma.event.findFirst({
       where: { id, deletedAt: null },
-      include: eventDetailInclude,
+      include: eventDetailInclude(true),
     });
     if (!event) throw new NotFoundException('Event not found');
     this.assertCanManage(user, event.organizerId);
@@ -457,6 +483,19 @@ export class EventsService {
       await this.locations.get(input.locationId);
     }
 
+    const previousCapacity = event.capacity;
+    const priceChanged =
+      input.price !== undefined &&
+      moneyString(event.price) !== moneyString(moneyDecimal(input.price));
+    const dateChanged =
+      (input.startAt !== undefined &&
+        event.startAt.getTime() !== startAt.getTime()) ||
+      (input.endAt !== undefined && event.endAt.getTime() !== endAt.getTime());
+    const locationChanged =
+      input.locationId !== undefined &&
+      input.locationId !== event.locationId &&
+      !!event.locationReleasedAt;
+
     const updated = await this.prisma.$transaction(async (tx) => {
       if (input.djIds) {
         await tx.eventDJ.deleteMany({ where: { eventId: id } });
@@ -493,9 +532,35 @@ export class EventsService {
           visibilityMode: input.visibilityMode,
           notifyOnEditDefault: input.notifyOnEditDefault,
         },
-        include: eventDetailInclude,
+        include: eventDetailInclude(true),
       });
     });
+
+    // D11/D14: price/date/location-after-release always notify; cosmetics respect toggle.
+    const notifyCosmetic =
+      input.notifyOnEditDefault ?? event.notifyOnEditDefault;
+    const mustNotify = priceChanged || dateChanged || locationChanged;
+    const cosmeticChanged =
+      input.description !== undefined ||
+      input.dressCode !== undefined ||
+      input.djIds !== undefined;
+    if (mustNotify || (notifyCosmetic && cosmeticChanged)) {
+      const type = priceChanged
+        ? 'event.price_changed'
+        : dateChanged
+          ? 'event.datetime_changed'
+          : locationChanged
+            ? 'event.location_changed'
+            : 'event.updated';
+      await this.notifyNonTerminalRegistrants(id, type);
+    }
+
+    if (input.capacity !== undefined && input.capacity > previousCapacity) {
+      await this.recomputeEventStatus(id);
+      await this.waitlist.onCapacityFreed(id);
+    } else if (input.capacity !== undefined) {
+      await this.recomputeEventStatus(id);
+    }
 
     const remaining = await this.remainingCapacity(
       updated.id,
@@ -576,7 +641,7 @@ export class EventsService {
       }
       return tx.event.findFirstOrThrow({
         where: { id },
-        include: eventDetailInclude,
+        include: eventDetailInclude(true),
       });
     });
 
@@ -595,7 +660,7 @@ export class EventsService {
     const updated = await this.prisma.event.update({
       where: { id },
       data: { status: EventStatus.OPEN },
-      include: eventDetailInclude,
+      include: eventDetailInclude(true),
     });
     const remaining = await this.remainingCapacity(
       updated.id,
@@ -667,7 +732,7 @@ export class EventsService {
       const ev = await tx.event.update({
         where: { id },
         data: { status: EventStatus.CANCELLED },
-        include: eventDetailInclude,
+        include: eventDetailInclude(true),
       });
 
       await tx.ticket.updateMany({
@@ -790,11 +855,111 @@ export class EventsService {
   async requireVisibleEvent(user: AuthUser, id: string) {
     const event = await this.prisma.event.findFirst({
       where: { id, deletedAt: null },
-      include: eventDetailInclude,
+      include: eventDetailInclude(true),
     });
     if (!event) throw new NotFoundException('Event not found');
     const allowed = await this.visibility.canSeeEvent(user, event);
     if (!allowed) throw new NotFoundException('Event not found');
     return event;
+  }
+
+  async notifyNonTerminalRegistrants(eventId: string, type: string) {
+    const activeStatuses: RegistrationStatus[] = [
+      RegistrationStatus.PENDING_APPROVAL,
+      RegistrationStatus.APPROVED,
+      RegistrationStatus.PENDING_PAYMENT,
+      RegistrationStatus.CONFIRMED,
+      RegistrationStatus.WAITLISTED,
+    ];
+    const recipients = await this.prisma.eventRegistration.findMany({
+      where: { eventId, status: { in: activeStatuses } },
+      select: { primaryUserId: true },
+      distinct: ['primaryUserId'],
+    });
+    await this.notifications.enqueueMany(
+      recipients.map((r) => ({
+        recipientUserId: r.primaryUserId,
+        type,
+        entityType: 'Event',
+        entityId: eventId,
+        dedupeKey: `event:${eventId}:${type}:user:${r.primaryUserId}:${Date.now()}`,
+      })),
+    );
+  }
+
+  /**
+   * Recompute OPEN ↔ FULL from active reservations. Does not reopen CLOSED/CANCELLED/COMPLETED.
+   */
+  async recomputeEventStatus(eventId: string): Promise<EventStatus> {
+    return this.prisma.$transaction(async (tx) => {
+      const event = await tx.event.findUniqueOrThrow({
+        where: { id: eventId },
+      });
+      if (
+        event.status === EventStatus.CANCELLED ||
+        event.status === EventStatus.COMPLETED ||
+        event.status === EventStatus.CLOSED ||
+        event.status === EventStatus.DRAFT
+      ) {
+        return event.status;
+      }
+
+      const used = await tx.capacityReservation.aggregate({
+        where: {
+          eventId,
+          status: CapacityReservationStatus.ACTIVE,
+        },
+        _sum: { peopleCount: true },
+      });
+      const reserved = used._sum.peopleCount ?? 0;
+      const next =
+        reserved >= event.capacity ? EventStatus.FULL : EventStatus.OPEN;
+      if (next !== event.status) {
+        await tx.event.update({
+          where: { id: eventId },
+          data: { status: next },
+        });
+      }
+      return next;
+    });
+  }
+
+  /** Organizer manually stops new registrations without cancelling. */
+  async close(user: AuthUser, id: string) {
+    const event = await this.requireManagedEvent(user, id);
+    if (
+      event.status === EventStatus.CANCELLED ||
+      event.status === EventStatus.COMPLETED ||
+      event.status === EventStatus.DRAFT
+    ) {
+      throw new UnprocessableEntityException(
+        `Cannot close event in status ${event.status}`,
+      );
+    }
+    const updated = await this.prisma.event.update({
+      where: { id },
+      data: { status: EventStatus.CLOSED },
+      include: eventDetailInclude(true),
+    });
+    const remaining = await this.remainingCapacity(
+      updated.id,
+      updated.capacity,
+    );
+    return this.serializeDetail(user, updated, remaining);
+  }
+
+  /** Mark past OPEN/FULL/CLOSED events as COMPLETED (worker safety net). */
+  async markCompletedEvents(): Promise<{ completed: number }> {
+    const result = await this.prisma.event.updateMany({
+      where: {
+        deletedAt: null,
+        endAt: { lte: new Date() },
+        status: {
+          in: [EventStatus.OPEN, EventStatus.FULL, EventStatus.CLOSED],
+        },
+      },
+      data: { status: EventStatus.COMPLETED },
+    });
+    return { completed: result.count };
   }
 }

@@ -141,3 +141,50 @@ describe('PaymentsService.expireRegistration', () => {
     );
   });
 });
+
+describe('PaymentsService.confirmPayment expiry race', () => {
+  it('does not confirm when registration is already EXPIRED', async () => {
+    const paymentUpdate = jest.fn().mockResolvedValue({});
+    const regUpdate = jest.fn();
+    const payment = {
+      id: 'pay-1',
+      status: PaymentStatus.CREATED,
+      registrationId: 'reg-1',
+      registration: {
+        id: 'reg-1',
+        status: RegistrationStatus.EXPIRED,
+        primaryUserId: 'u-1',
+      },
+    };
+    const tx = {
+      payment: {
+        findUnique: jest.fn().mockResolvedValue(payment),
+        update: paymentUpdate,
+      },
+      eventRegistration: { update: regUpdate },
+    };
+    const prisma = {
+      $transaction: jest.fn(async (fn: (t: typeof tx) => Promise<unknown>) =>
+        fn(tx),
+      ),
+    };
+    const tickets = { issueForRegistration: jest.fn() };
+    const notifications = { enqueue: jest.fn() };
+    const service = new PaymentsService(
+      prisma as never,
+      { get: jest.fn() } as never,
+      tickets as never,
+      notifications as never,
+      { onCapacityFreed: jest.fn() } as never,
+    );
+
+    await service.confirmPayment('pay-1', 'txn_late', {});
+    expect(regUpdate).not.toHaveBeenCalled();
+    expect(tickets.issueForRegistration).not.toHaveBeenCalled();
+    expect(paymentUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: PaymentStatus.CANCELLED }),
+      }),
+    );
+  });
+});

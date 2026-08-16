@@ -366,7 +366,7 @@ export class EventsService {
 
     const items = await this.prisma.event.findMany({
       where,
-      include: eventDetailInclude(true),
+      include: eventDetailInclude(false),
       orderBy: [{ startAt: 'asc' }, { id: 'asc' }],
       take: limit + 1,
       ...(cursor

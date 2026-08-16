@@ -231,9 +231,19 @@ export class PaymentsService {
         };
       }
 
-      const regStatus = payment.registration.status;
-      // Edge #5 / Payment-expiry race: never confirm after EXPIRED (capacity already released).
-      if (regStatus === RegistrationStatus.EXPIRED) {
+      // Serialize against expireRegistration (which also locks the event row).
+      await lockEventRow(tx, payment.registration.eventId);
+
+      const reg = await tx.eventRegistration.findUnique({
+        where: { id: payment.registrationId },
+      });
+      if (!reg) return null;
+
+      // Re-check under lock — covers TOCTOU with payment expiry.
+      if (
+        reg.status === RegistrationStatus.EXPIRED ||
+        (reg.expiresAt && reg.expiresAt.getTime() <= Date.now())
+      ) {
         await tx.payment.update({
           where: { id: paymentId },
           data: {
@@ -243,10 +253,38 @@ export class PaymentsService {
               Prisma.JsonNull) as Prisma.InputJsonValue,
           },
         });
+        if (reg.status === RegistrationStatus.PENDING_PAYMENT) {
+          // Expire path lost the race; finish expiry under this lock.
+          await tx.eventRegistration.update({
+            where: { id: reg.id },
+            data: { status: RegistrationStatus.EXPIRED },
+          });
+          await tx.capacityReservation.updateMany({
+            where: {
+              registrationId: reg.id,
+              status: CapacityReservationStatus.ACTIVE,
+            },
+            data: {
+              status: CapacityReservationStatus.RELEASED,
+              releasedAt: new Date(),
+            },
+          });
+        }
         return { rejectedExpired: true as const };
       }
-      if (regStatus !== RegistrationStatus.PENDING_PAYMENT) {
-        return { rejectedStatus: regStatus };
+
+      if (reg.status !== RegistrationStatus.PENDING_PAYMENT) {
+        return { rejectedStatus: reg.status };
+      }
+
+      const reservation = await tx.capacityReservation.findUnique({
+        where: { registrationId: reg.id },
+      });
+      if (
+        !reservation ||
+        reservation.status !== CapacityReservationStatus.ACTIVE
+      ) {
+        return { rejectedStatus: 'NO_ACTIVE_RESERVATION' as const };
       }
 
       try {
@@ -273,18 +311,29 @@ export class PaymentsService {
         throw err;
       }
 
-      await tx.eventRegistration.update({
-        where: { id: payment.registrationId },
+      // Conditional update — no-op if another txn already moved status.
+      const confirmed = await tx.eventRegistration.updateMany({
+        where: {
+          id: payment.registrationId,
+          status: RegistrationStatus.PENDING_PAYMENT,
+        },
         data: {
           status: RegistrationStatus.CONFIRMED,
           expiresAt: null,
         },
       });
+      if (confirmed.count === 0) {
+        await tx.payment.update({
+          where: { id: paymentId },
+          data: { status: PaymentStatus.CANCELLED },
+        });
+        return { rejectedExpired: true as const };
+      }
 
       return {
         already: false as const,
         registrationId: payment.registrationId,
-        primaryUserId: payment.registration.primaryUserId,
+        primaryUserId: reg.primaryUserId,
       };
     });
 

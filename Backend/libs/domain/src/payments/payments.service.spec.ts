@@ -146,14 +146,17 @@ describe('PaymentsService.confirmPayment expiry race', () => {
   it('does not confirm when registration is already EXPIRED', async () => {
     const paymentUpdate = jest.fn().mockResolvedValue({});
     const regUpdate = jest.fn();
+    const regUpdateMany = jest.fn();
     const payment = {
       id: 'pay-1',
       status: PaymentStatus.CREATED,
       registrationId: 'reg-1',
       registration: {
         id: 'reg-1',
+        eventId: 'evt-1',
         status: RegistrationStatus.EXPIRED,
         primaryUserId: 'u-1',
+        expiresAt: new Date(Date.now() - 1000),
       },
     };
     const tx = {
@@ -161,7 +164,19 @@ describe('PaymentsService.confirmPayment expiry race', () => {
         findUnique: jest.fn().mockResolvedValue(payment),
         update: paymentUpdate,
       },
-      eventRegistration: { update: regUpdate },
+      eventRegistration: {
+        findUnique: jest.fn().mockResolvedValue(payment.registration),
+        update: regUpdate,
+        updateMany: regUpdateMany,
+      },
+      capacityReservation: {
+        findUnique: jest.fn(),
+        updateMany: jest.fn(),
+      },
+      event: {
+        findUniqueOrThrow: jest.fn(),
+      },
+      $queryRaw: jest.fn().mockResolvedValue([{ id: 'evt-1', capacity: 10 }]),
     };
     const prisma = {
       $transaction: jest.fn(async (fn: (t: typeof tx) => Promise<unknown>) =>
@@ -179,12 +194,63 @@ describe('PaymentsService.confirmPayment expiry race', () => {
     );
 
     await service.confirmPayment('pay-1', 'txn_late', {});
-    expect(regUpdate).not.toHaveBeenCalled();
+    expect(regUpdateMany).not.toHaveBeenCalled();
     expect(tickets.issueForRegistration).not.toHaveBeenCalled();
     expect(paymentUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ status: PaymentStatus.CANCELLED }),
       }),
     );
+  });
+
+  it('refuses confirm when capacity reservation was already released', async () => {
+    const paymentUpdate = jest.fn().mockResolvedValue({});
+    const reg = {
+      id: 'reg-1',
+      eventId: 'evt-1',
+      status: RegistrationStatus.PENDING_PAYMENT,
+      primaryUserId: 'u-1',
+      expiresAt: new Date(Date.now() + 60_000),
+    };
+    const payment = {
+      id: 'pay-1',
+      status: PaymentStatus.CREATED,
+      registrationId: 'reg-1',
+      registration: reg,
+    };
+    const tx = {
+      payment: {
+        findUnique: jest.fn().mockResolvedValue(payment),
+        update: paymentUpdate,
+      },
+      eventRegistration: {
+        findUnique: jest.fn().mockResolvedValue(reg),
+        updateMany: jest.fn(),
+      },
+      capacityReservation: {
+        findUnique: jest.fn().mockResolvedValue({
+          id: 'cap-1',
+          status: 'RELEASED',
+        }),
+      },
+      $queryRaw: jest.fn().mockResolvedValue([{ id: 'evt-1', capacity: 10 }]),
+    };
+    const prisma = {
+      $transaction: jest.fn(async (fn: (t: typeof tx) => Promise<unknown>) =>
+        fn(tx),
+      ),
+    };
+    const tickets = { issueForRegistration: jest.fn() };
+    const service = new PaymentsService(
+      prisma as never,
+      { get: jest.fn() } as never,
+      tickets as never,
+      { enqueue: jest.fn() } as never,
+      { onCapacityFreed: jest.fn() } as never,
+    );
+
+    await service.confirmPayment('pay-1', 'txn_x', {});
+    expect(tickets.issueForRegistration).not.toHaveBeenCalled();
+    expect(tx.eventRegistration.updateMany).not.toHaveBeenCalled();
   });
 });

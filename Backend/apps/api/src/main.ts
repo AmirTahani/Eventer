@@ -41,11 +41,14 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);
 
-  const { writeFileSync, mkdirSync } = await import('node:fs');
-  const { join } = await import('node:path');
-  const outDir = join(process.cwd(), 'openapi');
-  mkdirSync(outDir, { recursive: true });
-  writeFileSync(join(outDir, 'openapi.json'), JSON.stringify(document, null, 2));
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const outDir = path.join(process.cwd(), 'openapi');
+  fs.mkdirSync(outDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(outDir, 'openapi.json'),
+    JSON.stringify(document, null, 2),
+  );
 
   const port = config.get('PORT', { infer: true });
   await app.listen(port);

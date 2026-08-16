@@ -145,7 +145,7 @@ export class EventsService {
       );
   }
 
-  async serializeListItem(event: EventDetail, remaining: number) {
+  serializeListItem(event: EventDetail, remaining: number) {
     const price = resolveActivePrice(
       event.price,
       event.currency,
@@ -166,11 +166,7 @@ export class EventsService {
     };
   }
 
-  async serializeDetail(
-    user: AuthUser,
-    event: EventDetail,
-    remaining: number,
-  ) {
+  async serializeDetail(user: AuthUser, event: EventDetail, remaining: number) {
     const price = resolveActivePrice(
       event.price,
       event.currency,
@@ -302,7 +298,8 @@ export class EventsService {
         currency: input.currency.toUpperCase().slice(0, 3),
         maxPeoplePerRegistration: input.maxPeoplePerRegistration,
         approvalRequired: input.approvalRequired ?? false,
-        visibilityMode: input.visibilityMode ?? EventVisibilityMode.ALL_APPROVED,
+        visibilityMode:
+          input.visibilityMode ?? EventVisibilityMode.ALL_APPROVED,
         notifyOnEditDefault: input.notifyOnEditDefault ?? true,
         status: EventStatus.DRAFT,
         eventDJs: input.djIds?.length
@@ -381,7 +378,10 @@ export class EventsService {
     const page = hasMore ? items.slice(0, limit) : items;
     const serialized = await Promise.all(
       page.map(async (event) => {
-        const remaining = await this.remainingCapacity(event.id, event.capacity);
+        const remaining = await this.remainingCapacity(
+          event.id,
+          event.capacity,
+        );
         return this.serializeListItem(event, remaining);
       }),
     );
@@ -389,7 +389,7 @@ export class EventsService {
     return {
       items: serialized,
       nextCursor: hasMore
-        ? encodeCursor({ id: page[page.length - 1]!.id })
+        ? encodeCursor({ id: page[page.length - 1].id })
         : null,
     };
   }
@@ -525,7 +525,8 @@ export class EventsService {
           startAt: input.startAt ? startAt : undefined,
           endAt: input.endAt ? endAt : undefined,
           capacity: input.capacity,
-          price: input.price !== undefined ? moneyDecimal(input.price) : undefined,
+          price:
+            input.price !== undefined ? moneyDecimal(input.price) : undefined,
           currency: input.currency?.toUpperCase().slice(0, 3),
           maxPeoplePerRegistration: input.maxPeoplePerRegistration,
           approvalRequired: input.approvalRequired,
@@ -712,7 +713,8 @@ export class EventsService {
     };
   }
 
-  async cancel(user: AuthUser, id: string, _reason?: string) {
+  async cancel(user: AuthUser, id: string, reason?: string) {
+    void reason;
     const event = await this.requireManagedEvent(user, id);
 
     const activeStatuses: RegistrationStatus[] = [

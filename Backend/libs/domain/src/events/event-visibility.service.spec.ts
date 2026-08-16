@@ -98,7 +98,9 @@ describe('EventVisibilityService', () => {
   it('enforces SELECTED_VOUCHERS via vouchedBy', async () => {
     const svc = service({
       user: {
-        findFirst: jest.fn().mockResolvedValue({ vouchedByUserId: 'voucher-9' }),
+        findFirst: jest
+          .fn()
+          .mockResolvedValue({ vouchedByUserId: 'voucher-9' }),
       },
     });
 
@@ -128,15 +130,12 @@ describe('EventVisibilityService', () => {
   });
 
   it('admins can always see', async () => {
-    const ok = await service().canSeeEvent(
-      baseUser({ roles: ['ADMIN'] }),
-      {
-        ...eventBase,
-        status: EventStatus.DRAFT,
-        visibilityMode: EventVisibilityMode.INVITE_ONLY,
-        accessGrants: [],
-      },
-    );
+    const ok = await service().canSeeEvent(baseUser({ roles: ['ADMIN'] }), {
+      ...eventBase,
+      status: EventStatus.DRAFT,
+      visibilityMode: EventVisibilityMode.INVITE_ONLY,
+      accessGrants: [],
+    });
     expect(ok).toBe(true);
   });
 });

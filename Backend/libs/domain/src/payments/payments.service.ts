@@ -18,16 +18,10 @@ import { PrismaService } from '@eventer/db';
 import { AuthUser } from '../auth/policies';
 import { moneyMultiply, moneyString } from '../common/money';
 import { NotificationsService } from '../notifications/notifications.service';
-import {
-  lockEventRow,
-  sumActiveReservations,
-} from '../registrations/capacity';
+import { lockEventRow, sumActiveReservations } from '../registrations/capacity';
 import { TicketsService } from '../tickets/tickets.service';
 import { WaitlistService, PAYMENT_TTL_MS } from '../waitlist/waitlist.service';
-import {
-  MockPaymentProvider,
-  PaymentProvider,
-} from './payment-provider';
+import { MockPaymentProvider, PaymentProvider } from './payment-provider';
 import { OrcaRailPaymentProvider } from './orcarail.provider';
 
 @Injectable()
@@ -115,6 +109,10 @@ export class PaymentsService {
         amount: moneyMultiply(reg.priceSnapshot, reg.peopleCount),
         currency: reg.currency,
         registrationId: reg.id,
+      });
+      await this.prisma.payment.update({
+        where: { id: last.id },
+        data: { providerTransactionId: checkout.providerTransactionId },
       });
       return {
         paymentId: last.id,
@@ -209,8 +207,7 @@ export class PaymentsService {
       return { received: true };
     }
 
-    const paymentId =
-      payload.metadata?.paymentId ?? existingByTxn?.id ?? null;
+    const paymentId = payload.metadata?.paymentId ?? existingByTxn?.id ?? null;
     if (!paymentId) {
       this.logger.warn('Webhook missing paymentId metadata');
       return { received: true };
@@ -285,8 +282,7 @@ export class PaymentsService {
           data: {
             status: PaymentStatus.CANCELLED,
             providerTransactionId,
-            rawProviderPayload: (rawPayload ??
-              Prisma.JsonNull) as Prisma.InputJsonValue,
+            rawProviderPayload: rawPayload ?? Prisma.JsonNull,
           },
         });
         if (reg.status === RegistrationStatus.PENDING_PAYMENT) {
@@ -330,8 +326,7 @@ export class PaymentsService {
             status: PaymentStatus.SUCCEEDED,
             paidAt: new Date(),
             providerTransactionId,
-            rawProviderPayload: (rawPayload ??
-              Prisma.JsonNull) as Prisma.InputJsonValue,
+            rawProviderPayload: rawPayload ?? Prisma.JsonNull,
           },
         });
       } catch (err) {

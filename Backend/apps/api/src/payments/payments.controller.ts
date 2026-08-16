@@ -32,10 +32,7 @@ export class PaymentsController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @HttpCode(201)
-  createIntent(
-    @CurrentUser() user: AuthUser,
-    @Body() body: CreateIntentDto,
-  ) {
+  createIntent(@CurrentUser() user: AuthUser, @Body() body: CreateIntentDto) {
     return this.payments.createIntent(user, body.registrationId);
   }
 
@@ -49,12 +46,11 @@ export class PaymentsController {
     @Req() req: Request & { rawBody?: string },
   ) {
     const rawBuf = (req as Request & { rawBody?: Buffer }).rawBody;
-    const raw =
-      Buffer.isBuffer(rawBuf)
-        ? rawBuf.toString('utf8')
-        : typeof rawBuf === 'string'
-          ? rawBuf
-          : JSON.stringify(body);
+    const raw = Buffer.isBuffer(rawBuf)
+      ? rawBuf.toString('utf8')
+      : typeof rawBuf === 'string'
+        ? rawBuf
+        : JSON.stringify(body);
     const signature = orcaSignature ?? mockSignature;
     return this.payments.handleWebhook(provider, raw, signature, body);
   }

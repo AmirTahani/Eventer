@@ -1,11 +1,6 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import {
-  FilesService,
-  JwtAuthGuard,
-  Roles,
-  RolesGuard,
-} from '@eventer/domain';
+import { FilesService, JwtAuthGuard, Roles, RolesGuard } from '@eventer/domain';
 import { UploadUrlDto } from './dto/upload-url.dto';
 
 @ApiTags('files')

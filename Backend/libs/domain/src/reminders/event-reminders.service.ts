@@ -83,7 +83,9 @@ export class EventRemindersService {
   /**
    * Worker sweep: find upcoming events and enqueue any due reminders.
    */
-  async reconcileReminders(now: Date = new Date()): Promise<{ scheduled: number }> {
+  async reconcileReminders(
+    now: Date = new Date(),
+  ): Promise<{ scheduled: number }> {
     const horizon = new Date(now.getTime() + 24 * 60 * 60 * 1000);
     const events = await this.prisma.event.findMany({
       where: {

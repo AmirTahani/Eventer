@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@eventer/db';
 import { decodeCursor, encodeCursor } from '../common/cursor';
 import { AuthUser } from '../auth/policies';
@@ -79,7 +76,9 @@ export class DjsService {
     const page = hasMore ? items.slice(0, limit) : items;
     return {
       items: page.map((d) => this.serialize(d)),
-      nextCursor: hasMore ? encodeCursor({ id: page[page.length - 1]!.id }) : null,
+      nextCursor: hasMore
+        ? encodeCursor({ id: page[page.length - 1].id })
+        : null,
     };
   }
 

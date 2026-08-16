@@ -61,9 +61,7 @@ describe('resolveActivePrice (D16)', () => {
   });
 
   it('builds a price increase hint for the next tier', () => {
-    expect(
-      resolvePriceIncreaseHint(tiers, new Date('2026-08-10')),
-    ).toEqual({
+    expect(resolvePriceIncreaseHint(tiers, new Date('2026-08-10'))).toEqual({
       nextAmount: '75.00',
       startsAt: '2026-08-25T00:00:00.000Z',
     });

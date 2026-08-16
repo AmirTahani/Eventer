@@ -23,9 +23,10 @@ export class HealthController {
   @ApiOkResponse({ description: 'Process is alive' })
   check() {
     return this.health.check([
-      async () => ({
-        api: { status: 'up' as const },
-      }),
+      () =>
+        Promise.resolve({
+          api: { status: 'up' as const },
+        }),
     ]);
   }
 

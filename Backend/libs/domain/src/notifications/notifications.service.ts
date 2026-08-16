@@ -28,7 +28,9 @@ export class NotificationsService {
   /**
    * Idempotent enqueue via unique `dedupeKey`. Duplicate keys are ignored.
    */
-  async enqueue(input: EnqueueNotificationInput): Promise<{ id: string } | null> {
+  async enqueue(
+    input: EnqueueNotificationInput,
+  ): Promise<{ id: string } | null> {
     const channel = input.channel ?? NotificationChannel.TELEGRAM;
     try {
       const row = await this.prisma.notification.create({

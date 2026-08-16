@@ -24,19 +24,13 @@ export class VouchersController {
   @UseGuards(JwtAuthGuard, RolesGuard, RateLimitGuard)
   @Roles('VOUCHER', 'ADMIN')
   @RateLimit({ name: 'invitation-create', limit: 20, windowMs: 60_000 })
-  create(
-    @CurrentUser() user: AuthUser,
-    @Body() body: CreateInvitationDto,
-  ) {
+  create(@CurrentUser() user: AuthUser, @Body() body: CreateInvitationDto) {
     return this.invitations.create(user, body);
   }
 
   @Post('invitations/:token/accept')
   @UseGuards(BotServiceGuard)
-  accept(
-    @Param('token') token: string,
-    @Body() body: AcceptInvitationDto,
-  ) {
+  accept(@Param('token') token: string, @Body() body: AcceptInvitationDto) {
     return this.invitations.accept(token, body);
   }
 }

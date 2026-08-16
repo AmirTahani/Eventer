@@ -23,7 +23,9 @@ export type WebhookPayload = {
 
 export interface PaymentProvider {
   readonly name: string;
-  createIntent(input: CreatePaymentIntentInput): Promise<CreatePaymentIntentResult>;
+  createIntent(
+    input: CreatePaymentIntentInput,
+  ): Promise<CreatePaymentIntentResult>;
   verifyWebhookSignature(
     rawBody: string,
     signatureHeader: string | undefined,
@@ -35,15 +37,15 @@ export interface PaymentProvider {
 export class MockPaymentProvider implements PaymentProvider {
   readonly name = 'mock';
 
-  async createIntent(
+  createIntent(
     input: CreatePaymentIntentInput,
   ): Promise<CreatePaymentIntentResult> {
     const providerTransactionId = `mock_txn_${input.paymentId}`;
-    return {
+    return Promise.resolve({
       provider: this.name,
       checkoutUrl: `https://provider.example/checkout/${providerTransactionId}`,
       providerTransactionId,
-    };
+    });
   }
 
   verifyWebhookSignature(
@@ -67,11 +69,20 @@ export class MockPaymentProvider implements PaymentProvider {
     const b = body as Record<string, unknown>;
     const metadata = (b.metadata ?? {}) as { paymentId?: string };
     return {
-      transactionId: String(b.transactionId ?? ''),
+      transactionId: unknownToString(b.transactionId),
       status: (b.status as WebhookPayload['status']) ?? 'failed',
-      amount: b.amount != null ? String(b.amount) : undefined,
-      currency: b.currency != null ? String(b.currency) : undefined,
+      amount: b.amount != null ? unknownToString(b.amount) : undefined,
+      currency: b.currency != null ? unknownToString(b.currency) : undefined,
       metadata,
     };
   }
+}
+
+function unknownToString(value: unknown): string {
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  if (typeof value === 'bigint') return value.toString();
+  return '';
 }

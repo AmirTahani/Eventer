@@ -1,5 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { AuditSource, Locale, Prisma, RoleName, UserStatus } from '@prisma/client';
+import {
+  AuditSource,
+  Locale,
+  Prisma,
+  RoleName,
+  UserStatus,
+} from '@prisma/client';
 import { PrismaService } from '@eventer/db';
 import { AuditService } from '../audit/audit.service';
 import { AuthUser } from '../auth/policies';
@@ -62,8 +68,7 @@ export class UsersService {
         data: {
           firstName: input.firstName,
           lastName: input.lastName ?? existing.lastName,
-          telegramUsername:
-            input.telegramUsername ?? existing.telegramUsername,
+          telegramUsername: input.telegramUsername ?? existing.telegramUsername,
         },
         include: userInclude,
       });
@@ -81,11 +86,7 @@ export class UsersService {
     });
   }
 
-  async grantRole(
-    userId: string,
-    role: RoleName,
-    grantedByUserId?: string,
-  ) {
+  async grantRole(userId: string, role: RoleName, grantedByUserId?: string) {
     const row = await this.prisma.userRole.upsert({
       where: { userId_role: { userId, role } },
       create: { userId, role, grantedByUserId },
@@ -122,9 +123,7 @@ export class UsersService {
     });
   }
 
-  serializeMe(
-    user: Prisma.UserGetPayload<{ include: typeof userInclude }>,
-  ) {
+  serializeMe(user: Prisma.UserGetPayload<{ include: typeof userInclude }>) {
     return {
       id: user.id,
       telegramUserId: user.telegramUserId.toString(),

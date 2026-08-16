@@ -9,7 +9,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "codegen": "openapi-typescript ../Backend/openapi/openapi.json -o src/generated/api.d.ts",
-    "test": "echo \"No tests yet (M1)\""
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -27,13 +28,19 @@
     "stylis-plugin-rtl": "^2.1.1"
   },
   "devDependencies": {
-    "@types/node": "^22.10.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.4",
+    "@types/node": "^22.20.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/stylis": "^4.2.7",
+    "@vitejs/plugin-react": "^6.0.5",
     "eslint": "^9.18.0",
     "eslint-config-next": "^15.1.0",
+    "jsdom": "^30.0.1",
     "openapi-typescript": "^7.5.0",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^4.1.10"
   }
 }

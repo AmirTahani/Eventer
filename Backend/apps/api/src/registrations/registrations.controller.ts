@@ -46,10 +46,7 @@ export class RegistrationsController {
   }
 
   @Post('capacity-requests/:id/approve')
-  approveCapacity(
-    @CurrentUser() user: AuthUser,
-    @Param('id') id: string,
-  ) {
+  approveCapacity(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     return this.registrations.approveCapacityOverride(user, id);
   }
 

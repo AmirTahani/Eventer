@@ -4,6 +4,7 @@ import { DbModule } from '@eventer/db';
 import { DomainModule } from '@eventer/domain';
 import { AuthController } from './auth/auth.controller';
 import { DjsController } from './djs/djs.controller';
+import { EventsController } from './events/events.controller';
 import { FilesController } from './files/files.controller';
 import { HealthModule } from './health/health.module';
 import { LocationsController } from './locations/locations.controller';
@@ -19,6 +20,7 @@ import { VouchersController } from './vouchers/vouchers.controller';
     DjsController,
     LocationsController,
     FilesController,
+    EventsController,
   ],
 })
 export class AppModule {}

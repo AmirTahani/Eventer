@@ -5,6 +5,7 @@ import { VouchersModule } from './vouchers/vouchers.module';
 import { DjsModule } from './djs/djs.module';
 import { LocationsModule } from './locations/locations.module';
 import { FilesModule } from './files/files.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { FilesModule } from './files/files.module';
     DjsModule,
     LocationsModule,
     FilesModule,
+    EventsModule,
   ],
   exports: [
     AuthModule,
@@ -22,6 +24,7 @@ import { FilesModule } from './files/files.module';
     DjsModule,
     LocationsModule,
     FilesModule,
+    EventsModule,
   ],
 })
 export class DomainModule {}

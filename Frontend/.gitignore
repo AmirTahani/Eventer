@@ -1,0 +1,10 @@
+# See https://nextjs.org/docs/app/api-reference/file-conventions/middleware
+node_modules/
+.next/
+out/
+coverage/
+.DS_Store
+*.log
+.env
+.env.local
+.env.*.local

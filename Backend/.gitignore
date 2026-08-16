@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+dist/
+coverage/
+.turbo/
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+
+# Logs / OS
+*.log
+.DS_Store
+.idea/
+.vscode/
+
+# OpenAPI generated at runtime (committed stub lives in openapi/)
+# openapi/openapi.json is produced when the API boots

@@ -56,3 +56,5 @@ export class WorkerJobsService implements OnModuleInit, OnModuleDestroy {
     }
   }
 }
+
+/** Milestone 11: worker dispatch loop */

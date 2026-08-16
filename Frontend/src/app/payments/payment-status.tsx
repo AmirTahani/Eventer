@@ -17,12 +17,7 @@ export function PaymentReturnView({
 }) {
   return (
     <Stack spacing={2}>
-      <Typography
-        variant="h4"
-        sx={{ fontFamily: '"Playfair Display", serif' }}
-      >
-        Payment received
-      </Typography>
+      <Typography variant="h4">Payment received</Typography>
       <Typography color="text.secondary">
         Thanks — we are confirming your payment on-chain. Your tickets will
         appear once the webhook settles (usually within a minute).
@@ -45,12 +40,7 @@ export function PaymentCancelView({
 }) {
   return (
     <Stack spacing={2}>
-      <Typography
-        variant="h4"
-        sx={{ fontFamily: '"Playfair Display", serif' }}
-      >
-        Payment canceled
-      </Typography>
+      <Typography variant="h4">Payment canceled</Typography>
       <Typography color="text.secondary">
         No charge was completed. You can reopen the pay link from Telegram or
         create a new payment intent from the dashboard while your registration

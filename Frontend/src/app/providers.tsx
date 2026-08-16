@@ -8,6 +8,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useMemo, useState, type ReactNode } from 'react';
 import { prefixer } from 'stylis';
 import rtlPlugin from 'stylis-plugin-rtl';
+import { AuthProvider } from '@/lib/auth';
+import { ColorModeProvider, useColorMode } from '@/theme/color-mode';
 import { getTheme } from '@/theme/theme';
 
 type Props = {
@@ -15,9 +17,19 @@ type Props = {
   locale?: 'en' | 'fa';
 };
 
-export function AppProviders({ children, locale = 'en' }: Props) {
+function ThemedApp({
+  children,
+  locale,
+}: {
+  children: ReactNode;
+  locale: 'en' | 'fa';
+}) {
   const direction = locale === 'fa' ? 'rtl' : 'ltr';
-  const theme = useMemo(() => getTheme(direction, locale), [direction, locale]);
+  const { mode } = useColorMode();
+  const theme = useMemo(
+    () => getTheme(direction, locale, mode),
+    [direction, locale, mode],
+  );
   const cache = useMemo(
     () =>
       createCache({
@@ -26,16 +38,25 @@ export function AppProviders({ children, locale = 'en' }: Props) {
       }),
     [direction],
   );
-  const [queryClient] = useState(() => new QueryClient());
 
   return (
     <CacheProvider value={cache}>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          {children}
-        </ThemeProvider>
-      </QueryClientProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AuthProvider>{children}</AuthProvider>
+      </ThemeProvider>
     </CacheProvider>
+  );
+}
+
+export function AppProviders({ children, locale = 'en' }: Props) {
+  const [queryClient] = useState(() => new QueryClient());
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ColorModeProvider>
+        <ThemedApp locale={locale}>{children}</ThemedApp>
+      </ColorModeProvider>
+    </QueryClientProvider>
   );
 }

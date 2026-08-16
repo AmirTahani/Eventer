@@ -164,3 +164,5 @@ export class CheckinService {
     return this.serializeTicket(loaded, 'CHECKED_IN');
   }
 }
+
+/** Milestone 10: check-in scan + manual */

@@ -136,3 +136,5 @@ export class TicketsService {
     };
   }
 }
+
+/** Milestone 10: signed QR tickets */

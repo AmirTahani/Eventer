@@ -4,9 +4,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CheckInMethod, TicketStatus } from '@prisma/client';
+import { AuditSource, CheckInMethod, TicketStatus } from '@prisma/client';
 import { PrismaService } from '@eventer/db';
 import { AuthUser, canManageEvent } from '../auth/policies';
+import { AuditService } from '../audit/audit.service';
 import { TicketsService } from '../tickets/tickets.service';
 
 @Injectable()
@@ -14,6 +15,7 @@ export class CheckinService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly tickets: TicketsService,
+    private readonly audit: AuditService,
   ) {}
 
   private async requireEventManager(user: AuthUser, eventId: string) {
@@ -160,9 +162,17 @@ export class CheckinService {
       });
     });
 
+    await this.audit.append({
+      actorUserId: user.id,
+      action: 'checkin.performed',
+      entityType: 'CheckIn',
+      entityId: eventId,
+      before: { ticketId, status: TicketStatus.ISSUED },
+      after: { ticketId, status: TicketStatus.CHECKED_IN, method },
+      source: AuditSource.WEB,
+    });
+
     const loaded = await this.loadTicketForResponse(ticketId);
     return this.serializeTicket(loaded, 'CHECKED_IN');
   }
 }
-
-/** Milestone 10: check-in scan + manual */

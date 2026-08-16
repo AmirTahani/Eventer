@@ -11,9 +11,11 @@ import {
   Prisma,
   RegistrationStatus,
   WaitlistStatus,
+  AuditSource,
 } from '@prisma/client';
 import { PrismaService } from '@eventer/db';
 import { AuthUser, canManageEvent } from '../auth/policies';
+import { AuditService } from '../audit/audit.service';
 import {
   DuplicateRegistrationException,
   InsufficientCapacityException,
@@ -36,6 +38,7 @@ export class RegistrationsService {
     private readonly events: EventsService,
     private readonly notifications: NotificationsService,
     private readonly waitlist: WaitlistService,
+    private readonly audit: AuditService,
   ) {}
 
   private serializeRegistration(
@@ -368,6 +371,16 @@ export class RegistrationsService {
       dedupeKey: `registration:${registrationId}:approved`,
     });
 
+    await this.audit.append({
+      actorUserId: user.id,
+      action: 'registration.approved',
+      entityType: 'EventRegistration',
+      entityId: registrationId,
+      before: { status: RegistrationStatus.PENDING_APPROVAL },
+      after: { status: result.reg.status },
+      source: AuditSource.WEB,
+    });
+
     return this.serializeRegistration(result.reg, {
       waitlistPosition: result.waitlistPosition,
     });
@@ -403,6 +416,16 @@ export class RegistrationsService {
       entityType: 'EventRegistration',
       entityId: registrationId,
       dedupeKey: `registration:${registrationId}:rejected`,
+    });
+
+    await this.audit.append({
+      actorUserId: user.id,
+      action: 'registration.rejected',
+      entityType: 'EventRegistration',
+      entityId: registrationId,
+      before: { status: RegistrationStatus.PENDING_APPROVAL },
+      after: { status: RegistrationStatus.REJECTED, reason: reason ?? null },
+      source: AuditSource.WEB,
     });
 
     return this.serializeRegistration(updated, {
@@ -606,6 +629,35 @@ export class RegistrationsService {
       await this.waitlist.onCapacityFreed(reg.eventId);
     }
 
+    await this.audit.append({
+      actorUserId: user.id,
+      action: 'registration.cancelled',
+      entityType: 'EventRegistration',
+      entityId: registrationId,
+      before: { status: reg.status },
+      after: { status: RegistrationStatus.CANCELLED },
+      source: AuditSource.WEB,
+    });
+
     return this.serializeRegistration(updated);
+  }
+
+  async listMine(user: AuthUser) {
+    const regs = await this.prisma.eventRegistration.findMany({
+      where: { primaryUserId: user.id },
+      include: { event: { select: { id: true, name: true } } },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+    return {
+      items: regs.map((r) => ({
+        id: r.id,
+        eventId: r.eventId,
+        eventName: r.event.name,
+        status: r.status,
+        peopleCount: r.peopleCount,
+        createdAt: r.createdAt.toISOString(),
+      })),
+    };
   }
 }

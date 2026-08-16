@@ -12,6 +12,8 @@ import { WaitlistModule } from './waitlist/waitlist.module';
 import { PaymentsModule } from './payments/payments.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { CheckinModule } from './checkin/checkin.module';
+import { AuditModule } from './audit/audit.module';
+import { RemindersModule } from './reminders/reminders.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { CheckinModule } from './checkin/checkin.module';
     PaymentsModule,
     TicketsModule,
     CheckinModule,
+    AuditModule,
+    RemindersModule,
   ],
   exports: [
     AuthModule,
@@ -43,6 +47,8 @@ import { CheckinModule } from './checkin/checkin.module';
     PaymentsModule,
     TicketsModule,
     CheckinModule,
+    AuditModule,
+    RemindersModule,
   ],
 })
 export class DomainModule {}

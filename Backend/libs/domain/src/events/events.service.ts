@@ -11,9 +11,11 @@ import {
   EventVisibilityMode,
   Prisma,
   RegistrationStatus,
+  AuditSource,
 } from '@prisma/client';
 import { PrismaService } from '@eventer/db';
 import { AuthUser, canManageEvent, isAdmin } from '../auth/policies';
+import { AuditService } from '../audit/audit.service';
 import { decodeCursor, encodeCursor } from '../common/cursor';
 import { moneyDecimal, moneyString } from '../common/money';
 import { DjsService } from '../djs/djs.service';
@@ -50,6 +52,7 @@ export class EventsService {
     private readonly locations: LocationsService,
     private readonly files: FilesService,
     private readonly notifications: NotificationsService,
+    private readonly audit: AuditService,
   ) {}
 
   private assertCanManage(user: AuthUser, organizerId: string) {
@@ -309,6 +312,15 @@ export class EventsService {
     });
 
     const remaining = await this.remainingCapacity(event.id, event.capacity);
+    await this.audit.append({
+      actorUserId: actor.id,
+      action: 'event.created',
+      entityType: 'Event',
+      entityId: event.id,
+      before: null,
+      after: { name: event.name, status: event.status },
+      source: AuditSource.WEB,
+    });
     return this.serializeDetail(actor, event, remaining);
   }
 
@@ -619,6 +631,16 @@ export class EventsService {
       })),
     );
 
+    await this.audit.append({
+      actorUserId: user.id,
+      action: 'event.location_released',
+      entityType: 'Event',
+      entityId: id,
+      before: { locationReleasedAt: null },
+      after: { locationReleasedAt: updated.locationReleasedAt!.toISOString() },
+      source: AuditSource.WEB,
+    });
+
     return {
       eventId: updated.id,
       locationReleasedAt: updated.locationReleasedAt!.toISOString(),
@@ -682,6 +704,16 @@ export class EventsService {
       })),
     );
 
+    await this.audit.append({
+      actorUserId: user.id,
+      action: 'event.cancelled',
+      entityType: 'Event',
+      entityId: id,
+      before: { status: event.status },
+      after: { status: EventStatus.CANCELLED },
+      source: AuditSource.WEB,
+    });
+
     const remaining = await this.remainingCapacity(
       updated.id,
       updated.capacity,
@@ -705,6 +737,19 @@ export class EventsService {
         subjectUserId: input.subjectUserId,
         grantedByUserId: user.id,
       },
+    });
+    await this.audit.append({
+      actorUserId: user.id,
+      action: 'event.access_grant_created',
+      entityType: 'Event',
+      entityId: eventId,
+      before: null,
+      after: {
+        grantId: grant.id,
+        grantType: grant.grantType,
+        subjectUserId: grant.subjectUserId,
+      },
+      source: AuditSource.WEB,
     });
     return {
       id: grant.id,

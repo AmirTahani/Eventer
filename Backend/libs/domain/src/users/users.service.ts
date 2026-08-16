@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, RoleName, UserStatus } from '@prisma/client';
+import { AuditSource, Locale, Prisma, RoleName, UserStatus } from '@prisma/client';
 import { PrismaService } from '@eventer/db';
+import { AuditService } from '../audit/audit.service';
 import { AuthUser } from '../auth/policies';
 
 const userInclude = {
@@ -12,7 +13,10 @@ const userInclude = {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
+  ) {}
 
   toAuthUser(
     user: Prisma.UserGetPayload<{ include: typeof userInclude }>,
@@ -82,10 +86,28 @@ export class UsersService {
     role: RoleName,
     grantedByUserId?: string,
   ) {
-    return this.prisma.userRole.upsert({
+    const row = await this.prisma.userRole.upsert({
       where: { userId_role: { userId, role } },
       create: { userId, role, grantedByUserId },
       update: {},
+    });
+    await this.audit.append({
+      actorUserId: grantedByUserId ?? null,
+      action: 'user.role_granted',
+      entityType: 'User',
+      entityId: userId,
+      before: null,
+      after: { role },
+      source: AuditSource.ADMIN_API,
+    });
+    return row;
+  }
+
+  async setLocale(userId: string, locale: Locale) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { locale },
+      include: userInclude,
     });
   }
 

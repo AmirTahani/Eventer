@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import type { Env } from '@eventer/common';
+import { RateLimitGuard } from '../common/rate-limit.guard';
 import { UsersModule } from '../users/users.module';
 import { AuthService } from './auth.service';
 import { BotServiceGuard } from './bot-service.guard';
@@ -31,12 +32,14 @@ import { RolesGuard } from './roles.guard';
     PoliciesService,
     RolesGuard,
     BotServiceGuard,
+    RateLimitGuard,
   ],
   exports: [
     AuthService,
     PoliciesService,
     RolesGuard,
     BotServiceGuard,
+    RateLimitGuard,
     JwtModule,
     PassportModule,
     UsersModule,

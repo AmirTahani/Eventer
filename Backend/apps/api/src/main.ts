@@ -5,9 +5,15 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import type { Env } from '@eventer/common';
 import { AppModule } from './app.module';
+import {
+  initSentryStub,
+  StructuredLogger,
+} from './observability/structured-logger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: new StructuredLogger('API'),
+  });
   app.use(cookieParser());
 
   app.useGlobalPipes(
@@ -19,6 +25,8 @@ async function bootstrap() {
   );
 
   const config = app.get(ConfigService<Env, true>);
+  initSentryStub(config.get('SENTRY_DSN', { infer: true }));
+
   const corsOrigin = config.get('CORS_ORIGIN', { infer: true });
   app.enableCors({ origin: corsOrigin, credentials: true });
 

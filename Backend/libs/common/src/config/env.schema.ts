@@ -13,7 +13,7 @@ export const envSchema = z.object({
     .string()
     .min(16)
     .default('dev-refresh-secret-change-me'),
-  TELEGRAM_BOT_TOKEN: z.string().min(1).default('dev-bot-token-for-local-tests'),
+  TELEGRAM_BOT_TOKEN: z.string().optional(),
   TELEGRAM_BOT_USERNAME: z.string().min(1).default('EventBot'),
   TELEGRAM_WEBHOOK_SECRET: z.string().optional(),
   ADMIN_TELEGRAM_ID: z.string().optional(),
@@ -25,6 +25,12 @@ export const envSchema = z.object({
     .default('dev-payment-webhook-secret'),
   TICKET_QR_SECRET: z.string().min(16).default('dev-ticket-qr-secret-change'),
   CORS_ORIGIN: z.string().default('http://localhost:3001'),
+  SENTRY_DSN: z.string().optional(),
+  R2_ACCOUNT_ID: z.string().optional(),
+  R2_ACCESS_KEY_ID: z.string().optional(),
+  R2_SECRET_ACCESS_KEY: z.string().optional(),
+  R2_BUCKET: z.string().optional(),
+  R2_PUBLIC_BASE_URL: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

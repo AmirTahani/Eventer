@@ -5,6 +5,7 @@ import { PassportModule } from '@nestjs/passport';
 import type { Env } from '@eventer/common';
 import { UsersModule } from '../users/users.module';
 import { AuthService } from './auth.service';
+import { BotServiceGuard } from './bot-service.guard';
 import { JwtStrategy } from './jwt.strategy';
 import { PoliciesService } from './policies.service';
 import { RolesGuard } from './roles.guard';
@@ -24,11 +25,18 @@ import { RolesGuard } from './roles.guard';
       }),
     }),
   ],
-  providers: [AuthService, JwtStrategy, PoliciesService, RolesGuard],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    PoliciesService,
+    RolesGuard,
+    BotServiceGuard,
+  ],
   exports: [
     AuthService,
     PoliciesService,
     RolesGuard,
+    BotServiceGuard,
     JwtModule,
     PassportModule,
     UsersModule,

@@ -10,6 +10,7 @@ describe('validateEnv', () => {
 
     expect(env.PORT).toBe(3000);
     expect(env.PAYMENT_PROVIDER).toBe('mock');
+    expect(env.TELEGRAM_BOT_USERNAME).toBe('EventBot');
   });
 
   it('rejects a missing DATABASE_URL', () => {

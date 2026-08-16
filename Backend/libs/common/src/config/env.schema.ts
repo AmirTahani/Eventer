@@ -14,6 +14,7 @@ export const envSchema = z.object({
     .min(16)
     .default('dev-refresh-secret-change-me'),
   TELEGRAM_BOT_TOKEN: z.string().min(1).default('dev-bot-token-for-local-tests'),
+  TELEGRAM_BOT_USERNAME: z.string().min(1).default('EventBot'),
   TELEGRAM_WEBHOOK_SECRET: z.string().optional(),
   ADMIN_TELEGRAM_ID: z.string().optional(),
   BOT_SERVICE_TOKEN: z.string().min(16).default('dev-bot-service-token'),

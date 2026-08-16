@@ -2,11 +2,13 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import type { Env } from '@eventer/common';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser());
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -29,7 +31,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);
 
-  // Write OpenAPI spec for Frontend codegen (M1 stub)
   const { writeFileSync, mkdirSync } = await import('node:fs');
   const { join } = await import('node:path');
   const outDir = join(process.cwd(), 'openapi');

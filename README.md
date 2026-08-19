@@ -21,7 +21,7 @@ cd Backend
 cp .env.example .env   # adjust DATABASE_URL / secrets
 pnpm install
 pnpm prisma migrate deploy
-pnpm start:api:dev     # http://localhost:3000/health  +  /docs
+pnpm start:api:dev     # http://localhost:4001/health  +  /docs
 # optional: pnpm start:bot:dev / pnpm start:worker:dev
 
 # Frontend
@@ -29,7 +29,7 @@ cd Frontend
 cp .env.example .env
 pnpm install
 pnpm codegen           # types from Backend/openapi/openapi.json
-pnpm dev               # http://localhost:3001
+pnpm dev               # http://localhost:4000
 ```
 
 Full app stack via Compose: `docker compose --profile full up --build`
@@ -42,7 +42,7 @@ Eventer supports `PAYMENT_PROVIDER=mock` (default) or `PAYMENT_PROVIDER=orcarail
    - `PAYMENT_PROVIDER=orcarail`
    - `ORCARAIL_API_KEY` / `ORCARAIL_API_SECRET`
    - `ORCARAIL_TOKEN_ID` / `ORCARAIL_NETWORK_ID` (catalog UUIDs from OrcaRail)
-   - `ORCARAIL_RETURN_URL` / `ORCARAIL_CANCEL_URL` (e.g. `http://localhost:3001/payments/return` and `.../cancel`)
+   - `ORCARAIL_RETURN_URL` / `ORCARAIL_CANCEL_URL` (e.g. `http://localhost:4000/payments/return` and `.../cancel`)
    - `ORCARAIL_WEBHOOK_SECRET` (dashboard webhook secret, or your API secret)
 2. In the OrcaRail dashboard, point the webhook URL to  
    `https://<your-eventer-api>/payments/webhook/orcarail`  

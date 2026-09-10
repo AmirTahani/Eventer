@@ -1,22 +1,37 @@
 import type { Metadata } from 'next';
 import { HomeLanding } from '@/components/HomeLanding';
+import { JsonLd } from '@/components/JsonLd';
+import { faqJsonLd } from '@/lib/structured-data';
 import { resolveTelegramBotUsername } from '@/lib/telegram';
+import { SITE_URL } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Private events, invite only',
+  title: 'Invite-only private events on Telegram',
   description:
-    'Eventer is an invite-gated event platform. Guests register and pay in Telegram. Organizers run capacity, tickets, and check-in from the web.',
-  alternates: { canonical: 'https://eventer.world' },
+    'Guests register and pay in Telegram. Hosts run capacity, tickets, and check-in from the web. The venue stays hidden until you release it.',
+  alternates: { canonical: SITE_URL },
   openGraph: {
-    title: 'Eventer — Private events, invite only',
+    title: 'Invite-only private events on Telegram',
     description:
-      'Invite-gated events. Telegram for guests. A web console for organizers.',
-    url: 'https://eventer.world',
+      'Guests register and pay in Telegram. Hosts run the door from the web. Address hidden until you release it.',
+    url: SITE_URL,
     siteName: 'Eventer',
     type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Invite-only private events on Telegram',
+    description:
+      'Guests register and pay in Telegram. Hosts run the door from the web.',
   },
 };
 
 export default function HomePage() {
-  return <HomeLanding botUsername={resolveTelegramBotUsername()} />;
+  return (
+    <>
+      <JsonLd data={faqJsonLd()} />
+      <HomeLanding botUsername={resolveTelegramBotUsername()} />
+    </>
+  );
 }

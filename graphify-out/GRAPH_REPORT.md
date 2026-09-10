@@ -1,16 +1,16 @@
 # Graph Report - Eventer  (2026-09-10)
 
 ## Corpus Check
-- 301 files · ~161,965 words
+- 314 files · ~164,724 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2735 nodes · 4089 edges · 264 communities (184 shown, 78 thin omitted)
+- 2761 nodes · 4165 edges · 265 communities (183 shown, 80 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 105 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ac5c8ece`
+- Built from commit: `7383151e`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -18,20 +18,20 @@
 - AuthUser
 - nest-cli.json
 - api/tsconfig.app.json
-- PaymentsService
+- orcarail.provider.ts
 - DjsService
-- .create
-- telegram-bot.service.ts
-- domain.module.ts
+- vouchers.controller.ts
+- common/src/index.ts
+- @nestjs/common
 - CheckinService
 - events.service.ts
 - Backend/package.json
-- @nestjs/common
+- app.module.ts
 - devDependencies
 - scripts
 - compilerOptions
 - LocationsService
-- FilesService
+- files.controller.ts
 - DashboardShell.tsx
 - pricing-resolver.ts
 - registrations.service.ts
@@ -39,25 +39,25 @@
 - Frontend/package.json
 - HealthController
 - api/src/main.ts
-- react
+- PageHeader.tsx
 - 10.3 Events
 - api.ts
 - compilerOptions
 - vitest
 - .telegramLogin
 - providers.tsx
-- dependencies
 - devDependencies
+- PaymentsService
 - jest
 - CreateEventDto
 - 3. System & Module Architecture
-- auth.module.ts
+- auth.service.ts
 - class-validator
 - UpdateEventDto
 - ReplacePricingTiersDto
 - UpdateDjDto
 - RejectRegistrationDto
-- .wireHandlers
+- telegram-bot.service.ts
 - NotificationsService
 - 12. Deployment, Docker & Observability
 - UI Component Reference
@@ -68,7 +68,7 @@
 - CreateRegistrationDto
 - 2. Lifecycles & State Machines
 - 6. Roadmap & Build Plan
-- scripts
+- .createIntent
 - 8. Testing & Automation Strategy
 - 7. Design System — Material UI, Luxury Navy Palette
 - bot/tsconfig.app.json
@@ -77,7 +77,7 @@
 - worker/tsconfig.app.json
 - common/tsconfig.lib.json
 - db/tsconfig.lib.json
-- policies.ts
+- self-only.guard.ts
 - api.d.ts
 - domain/tsconfig.lib.json
 - Backend/eslint.config.mjs
@@ -90,7 +90,7 @@
 - next-env.d.ts
 - 1. Executive Summary & Product Requirements
 - 4. Database Schema
-- invitations.service.ts
+- auth.module.ts
 - Eventer
 - 5. UX Flows
 - tsconfig.build.json
@@ -201,7 +201,7 @@
 - async-cheap-condition-before-await.md
 - Prefer Statically Analyzable Paths
 - server-hoist-static-io.md
-- ScanDto
+- @playwright/test
 - CapacityRequestDto
 - Space Elements Based on How Closely Related They Are
 - Create a Clear Visual Hierarchy
@@ -277,10 +277,11 @@
 - server-parallel-nested-fetching.md
 - server-serialization.md
 - _template.md
+- auth.tsx
 
 ## God Nodes (most connected - your core abstractions)
-1. `AuthUser` - 113 edges
-2. `@nestjs/common` - 71 edges
+1. `AuthUser` - 115 edges
+2. `@nestjs/common` - 72 edges
 3. `UI Component Reference` - 62 edges
 4. `CurrentUser` - 41 edges
 5. `PrismaService` - 37 edges
@@ -295,20 +296,20 @@
   Backend/apps/api/src/audit/audit.controller.ts → Backend/libs/domain/src/auth/roles.guard.ts
 - `CheckinController` --references--> `Roles()`  [EXTRACTED]
   Backend/apps/api/src/checkin/checkin.controller.ts → Backend/libs/domain/src/auth/roles.guard.ts
+- `build()` --calls--> `AuthService`  [EXTRACTED]
+  Backend/libs/domain/src/auth/auth.service.spec.ts → Backend/libs/domain/src/auth/auth.service.ts
 - `service()` --calls--> `EventVisibilityService`  [EXTRACTED]
   Backend/libs/domain/src/events/event-visibility.service.spec.ts → Backend/libs/domain/src/events/event-visibility.service.ts
 - `buildProvider()` --calls--> `OrcaRailPaymentProvider`  [EXTRACTED]
   Backend/libs/domain/src/payments/orcarail.provider.spec.ts → Backend/libs/domain/src/payments/orcarail.provider.ts
-- `build()` --calls--> `InvitationsService`  [EXTRACTED]
-  Backend/libs/domain/src/vouchers/invitations.service.spec.ts → Backend/libs/domain/src/vouchers/invitations.service.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (264 total, 78 thin omitted)
+## Communities (265 total, 80 thin omitted)
 
 ### Community 0 - "AuthUser"
-Cohesion: 0.19
+Cohesion: 0.21
 Nodes (5): AuthUser, moneyDecimal(), eventDetailInclude(), EventsService, Injectable
 
 ### Community 1 - "nest-cli.json"
@@ -319,41 +320,41 @@ Nodes (46): compilerOptions, entryFile, root, sourceRoot, type, compilerOptions,
 Cohesion: 0.25
 Nodes (7): compilerOptions, declaration, outDir, exclude, extends, include, ../../tsconfig.json
 
-### Community 3 - "PaymentsService"
-Cohesion: 0.07
-Nodes (27): PaymentsController, ApiBearerAuth, ApiTags, Body, Controller, HttpCode, Param, Post (+19 more)
+### Community 3 - "orcarail.provider.ts"
+Cohesion: 0.12
+Nodes (14): mapOrcaRailWebhook(), OrcaRailPaymentProvider, OrcaRailProviderConfig, OrcaRailWebhookBody, buildProvider(), CreatePaymentIntentInput, CreatePaymentIntentResult, MockPaymentProvider (+6 more)
 
 ### Community 4 - "DjsService"
 Cohesion: 0.12
 Nodes (14): DjsController, ApiBearerAuth, ApiTags, Body, Controller, Delete, Get, Param (+6 more)
 
-### Community 5 - ".create"
+### Community 5 - "vouchers.controller.ts"
 Cohesion: 0.11
 Nodes (16): AcceptInvitationDto, IsOptional, IsString, MinLength, CreateInvitationDto, IsOptional, IsString, MinLength (+8 more)
 
-### Community 6 - "telegram-bot.service.ts"
+### Community 6 - "common/src/index.ts"
 Cohesion: 0.09
-Nodes (20): BotModule, Module, BotContext, SessionData, Module, WorkerModule, CommonModule, Global (+12 more)
+Nodes (19): BotModule, Module, Module, WorkerModule, CommonModule, Global, Module, envSchema (+11 more)
 
-### Community 7 - "domain.module.ts"
+### Community 7 - "@nestjs/common"
 Cohesion: 0.11
-Nodes (26): AuditModule, Module, AuthModule, Module, CheckinModule, Module, DjsModule, Module (+18 more)
+Nodes (30): AuditModule, Module, AuthModule, Module, CheckinModule, Module, nanoid(), DjsModule (+22 more)
 
 ### Community 8 - "CheckinService"
 Cohesion: 0.18
 Nodes (9): CheckinController, ApiBearerAuth, ApiTags, Body, Controller, Post, UseGuards, CheckinService (+1 more)
 
 ### Community 9 - "events.service.ts"
-Cohesion: 0.12
-Nodes (14): PrismaService, Injectable, AuditAppendInput, AuditService, Injectable, decodeCursor(), encodeCursor(), IdCursor (+6 more)
+Cohesion: 0.11
+Nodes (21): PrismaService, Injectable, AuditAppendInput, AuditService, Injectable, canManageEvent(), hasRole(), isAdmin() (+13 more)
 
 ### Community 10 - "Backend/package.json"
 Cohesion: 0.06
-Nodes (35): description, eslint, @types/node, typescript, license, name, private, version (+27 more)
+Nodes (33): description, eslint, @types/node, typescript, license, name, private, version (+25 more)
 
-### Community 11 - "@nestjs/common"
-Cohesion: 0.21
-Nodes (10): CreateIntentDto, IsUUID, JwtAuthGuard, Injectable, ROLES_KEY, RolesGuard, Injectable, RateLimit() (+2 more)
+### Community 11 - "app.module.ts"
+Cohesion: 0.10
+Nodes (20): ManualDto, ScanDto, IsString, IsUUID, CreateIntentDto, IsUUID, TicketsController, ApiBearerAuth (+12 more)
 
 ### Community 12 - "devDependencies"
 Cohesion: 0.07
@@ -371,21 +372,21 @@ Nodes (26): compilerOptions, allowSyntheticDefaultImports, baseUrl, declaration,
 Cohesion: 0.11
 Nodes (14): LocationsController, ApiBearerAuth, ApiTags, Body, Controller, Delete, Get, Param (+6 more)
 
-### Community 16 - "FilesService"
-Cohesion: 0.12
+### Community 16 - "files.controller.ts"
+Cohesion: 0.14
 Nodes (13): IsOptional, IsString, MinLength, UploadUrlDto, FilesController, ApiBearerAuth, ApiTags, Body (+5 more)
 
 ### Community 17 - "DashboardShell.tsx"
-Cohesion: 0.15
-Nodes (19): DashboardHomePage(), DashboardShell(), DrawerNav(), moreIcons, MoreSheet(), tabIcons, Props, ThemeModeSwitch() (+11 more)
+Cohesion: 0.18
+Nodes (16): DashboardHomePage(), DashboardShell(), DrawerNav(), moreIcons, MoreSheet(), tabIcons, useAuth(), allNav (+8 more)
 
 ### Community 18 - "pricing-resolver.ts"
-Cohesion: 0.29
-Nodes (7): moneyString(), ActivePrice, PriceIncreaseHint, PricingTierLike, resolveActivePrice(), resolvePriceIncreaseHint(), validatePricingTiersInput()
+Cohesion: 0.22
+Nodes (8): moneyMultiply(), moneyString(), ActivePrice, PriceIncreaseHint, PricingTierLike, resolveActivePrice(), resolvePriceIncreaseHint(), validatePricingTiersInput()
 
 ### Community 19 - "registrations.service.ts"
-Cohesion: 0.12
-Nodes (13): DuplicateRegistrationException, InsufficientCapacityException, moneyMultiply(), CapacityDecision, decideCapacityOutcome(), lockEventRow(), sumActiveReservations(), RegistrationsService (+5 more)
+Cohesion: 0.11
+Nodes (13): DuplicateRegistrationException, InsufficientCapacityException, EnqueueNotificationInput, CapacityDecision, decideCapacityOutcome(), lockEventRow(), sumActiveReservations(), RegistrationsService (+5 more)
 
 ### Community 20 - "dependencies"
 Cohesion: 0.09
@@ -403,16 +404,16 @@ Nodes (8): ApiOperation, HealthController, ApiOkResponse, ApiTags, Controller, G
 Cohesion: 0.13
 Nodes (8): AppModule, Module, bootstrap(), initSentryStub(), StructuredLogger, Injectable, parseCorsOrigins(), cookie-parser
 
-### Community 24 - "react"
-Cohesion: 0.13
-Nodes (6): steps, MobileFab(), Props, PageHeader(), Props, react
+### Community 24 - "PageHeader.tsx"
+Cohesion: 0.16
+Nodes (4): MobileFab(), Props, PageHeader(), Props
 
 ### Community 25 - "10.3 Events"
 Cohesion: 0.06
 Nodes (31): 10.1 Auth, 10.2 Vouchers / Invitations, 10.3 Events, 10.4 Registrations, 10.5 Payments, 10.6 Tickets & Check-in, 10.7 Audit logs, 10. API Reference — Detailed Request/Response Contracts (+23 more)
 
 ### Community 26 - "api.ts"
-Cohesion: 0.15
+Cohesion: 0.18
 Nodes (15): InvitationsPage(), handleCreate(), completeLogin(), API_BASE_URL, ApiError, apiFetch(), createInvitation(), CreateInvitationInput (+7 more)
 
 ### Community 27 - "compilerOptions"
@@ -420,24 +421,24 @@ Cohesion: 0.11
 Nodes (18): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+10 more)
 
 ### Community 28 - "vitest"
-Cohesion: 0.18
-Nodes (10): CancelContent(), searchParams, PaymentCancelView(), PaymentReturnView(), resolvePaymentIntentId(), ReturnContent(), searchParams, AppProviders() (+2 more)
+Cohesion: 0.17
+Nodes (11): replace, CancelContent(), searchParams, PaymentCancelView(), PaymentReturnView(), resolvePaymentIntentId(), ReturnContent(), searchParams (+3 more)
 
 ### Community 29 - ".telegramLogin"
-Cohesion: 0.17
-Nodes (11): ApiOkResponse, Body, HttpCode, Post, TelegramLoginDto, IsInt, IsOptional, IsString (+3 more)
+Cohesion: 0.12
+Nodes (14): AuthController, ApiOkResponse, ApiTags, Body, Controller, HttpCode, Post, TelegramLoginDto (+6 more)
 
 ### Community 30 - "providers.tsx"
-Cohesion: 0.13
-Nodes (17): Props, ThemedApp(), AuthContext, AuthContextValue, AuthProvider(), AuthUser, ColorModeContext, ColorModeContextValue (+9 more)
+Cohesion: 0.12
+Nodes (18): steps, Props, ThemedApp(), Props, ThemeModeSwitch(), ColorModeContext, ColorModeContextValue, ColorModeProvider() (+10 more)
 
-### Community 31 - "dependencies"
-Cohesion: 0.13
-Nodes (15): dependencies, @emotion/cache, @emotion/react, @emotion/styled, @mui/icons-material, @mui/material, @mui/material-nextjs, @mui/x-data-grid (+7 more)
+### Community 31 - "devDependencies"
+Cohesion: 0.04
+Nodes (43): dependencies, @emotion/cache, @emotion/react, @emotion/styled, @mui/icons-material, @mui/material, @mui/material-nextjs, @mui/x-data-grid (+35 more)
 
-### Community 32 - "devDependencies"
-Cohesion: 0.13
-Nodes (15): devDependencies, eslint, eslint-config-next, jsdom, openapi-typescript, @testing-library/jest-dom, @testing-library/react, @testing-library/user-event (+7 more)
+### Community 32 - "PaymentsService"
+Cohesion: 0.14
+Nodes (7): Get, PaymentsService, Injectable, signTicketQrToken(), TicketsService, Injectable, verifyTicketQrToken()
 
 ### Community 33 - "jest"
 Cohesion: 0.14
@@ -451,9 +452,9 @@ Nodes (13): CreateEventDto, PricingTierDto, IsArray, IsBoolean, IsDateString, Is
 Cohesion: 0.15
 Nodes (12): 3.10 i18n, 3.11 Security checklist (mitigations), 3.1 High-level shape, 3.2 Module boundaries, 3.3 Representative API design, 3.4 Telegram architecture, 3.5 Background jobs & Redis, 3.6 Authentication & authorization (+4 more)
 
-### Community 36 - "auth.module.ts"
-Cohesion: 0.10
-Nodes (18): AuthController, ApiTags, Controller, Env, AuthService, Injectable, BotServiceGuard, Injectable (+10 more)
+### Community 36 - "auth.service.ts"
+Cohesion: 0.21
+Nodes (7): AuthService, build(), Injectable, signTelegramLoginPayload(), TelegramLoginPayload, verifyTelegramLoginHash(), @nestjs/jwt
 
 ### Community 38 - "UpdateEventDto"
 Cohesion: 0.17
@@ -471,9 +472,9 @@ Nodes (5): IsOptional, IsString, MinLength, ValidateIf, UpdateDjDto
 Cohesion: 0.40
 Nodes (4): RejectRegistrationDto, IsOptional, IsString, MaxLength
 
-### Community 42 - ".wireHandlers"
-Cohesion: 0.05
-Nodes (21): TicketsController, ApiBearerAuth, ApiTags, Controller, Get, UseGuards, ApiBearerAuth, ApiTags (+13 more)
+### Community 42 - "telegram-bot.service.ts"
+Cohesion: 0.09
+Nodes (10): Get, UseGuards, parseInviteStartPayload(), BotContext, SessionData, TelegramBotService, Injectable, Injectable (+2 more)
 
 ### Community 43 - "NotificationsService"
 Cohesion: 0.13
@@ -515,9 +516,9 @@ Nodes (8): 2.1 Event lifecycle, 2.2 Registration lifecycle, 2.3 Payment lifecycl
 Cohesion: 0.22
 Nodes (8): 6.1 Stack decision, 6.2 MVP scope, 6.3 Phase 2, 6.4 Phase 3, 6.5 Milestones, 6.6 Risk register, 6.7 Unresolved decisions — needs your input before/around the listed milestone, 6. Roadmap & Build Plan
 
-### Community 53 - "scripts"
-Cohesion: 0.22
-Nodes (9): scripts, build, codegen, dev, lint, start, test, test:watch (+1 more)
+### Community 53 - ".createIntent"
+Cohesion: 0.18
+Nodes (11): PaymentsController, ApiBearerAuth, ApiTags, Body, Controller, HttpCode, Param, Post (+3 more)
 
 ### Community 54 - "8. Testing & Automation Strategy"
 Cohesion: 0.22
@@ -551,10 +552,6 @@ Nodes (7): compilerOptions, declaration, outDir, exclude, extends, include, ../.
 Cohesion: 0.25
 Nodes (7): compilerOptions, declaration, outDir, exclude, extends, include, ../../tsconfig.json
 
-### Community 62 - "policies.ts"
-Cohesion: 0.16
-Nodes (9): canManageEvent(), hasRole(), isAdmin(), SelfOnlyGuard, Injectable, EventVisibilityService, EventVisibilitySubject, service() (+1 more)
-
 ### Community 63 - "api.d.ts"
 Cohesion: 0.33
 Nodes (5): components, $defs, operations, paths, webhooks
@@ -583,9 +580,9 @@ Nodes (5): 1.1 What we're building, 1.2 Roles, 1.3 Permission matrix, 1.4 Key ar
 Cohesion: 0.33
 Nodes (5): 4.1 Core tables (abbreviated column lists — types/constraints noted), 4.2 Mermaid ERD, 4.3 Capacity concurrency strategy (the critical part), 4.4 Key indexes (beyond PKs/FKs), 4. Database Schema
 
-### Community 75 - "invitations.service.ts"
-Cohesion: 0.16
-Nodes (9): PoliciesService, Injectable, nanoid(), InvitationsService, build(), Injectable, Module, VouchersModule (+1 more)
+### Community 75 - "auth.module.ts"
+Cohesion: 0.11
+Nodes (16): Env, BotServiceGuard, Injectable, JwtPayload, JwtStrategy, Injectable, PoliciesService, Injectable (+8 more)
 
 ### Community 76 - "Eventer"
 Cohesion: 0.33
@@ -660,8 +657,8 @@ Cohesion: 0.12
 Nodes (16): 5.10 Subscribe to Derived State, 5.11 Use Functional setState Updates, 5.12 Use Lazy State Initialization, 5.13 Use Transitions for Non-Urgent Updates, 5.14 Use useDeferredValue for Expensive Derived Renders, 5.15 Use useRef for Transient Values, 5.1 Calculate Derived State During Rendering, 5.2 Defer State Reads to Usage Point (+8 more)
 
 ### Community 95 - "rate-limit.guard.ts"
-Cohesion: 0.16
-Nodes (7): getLimiter(), limiters, RATE_LIMIT_KEY, RateLimitGuard, RateLimitOptions, Injectable, InMemoryRateLimiter
+Cohesion: 0.15
+Nodes (8): getLimiter(), limiters, RATE_LIMIT_KEY, RateLimit(), RateLimitGuard, RateLimitOptions, Injectable, InMemoryRateLimiter
 
 ### Community 96 - "UI Design Brain"
 Cohesion: 0.13
@@ -1015,10 +1012,6 @@ Nodes (4): Modern Properties vs Legacy Properties, Orphans and Widows, Page Brea
 Cohesion: 0.50
 Nodes (3): File-System Paths, Import Paths, Prefer Statically Analyzable Paths
 
-### Community 187 - "ScanDto"
-Cohesion: 0.50
-Nodes (4): ManualDto, ScanDto, IsString, IsUUID
-
 ### Community 188 - "CapacityRequestDto"
 Cohesion: 0.50
 Nodes (4): CapacityRequestDto, IsInt, Min, Type
@@ -1043,25 +1036,29 @@ Nodes (3): Combining Typefaces, Evoke Emotion Using a Second Typeface for Headin
 Cohesion: 0.67
 Nodes (3): Enable Kerning, Kerning and Letter Spacing, Letter Spacing (Tracking) Guidelines
 
+### Community 264 - "auth.tsx"
+Cohesion: 0.32
+Nodes (5): AuthContext, AuthContextValue, AuthProvider(), AuthUser, user
+
 ## Knowledge Gaps
-- **1436 isolated node(s):** `extends`, `../../tsconfig.json`, `declaration`, `outDir`, `include` (+1431 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1827 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **78 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **1444 isolated node(s):** `extends`, `../../tsconfig.json`, `declaration`, `outDir`, `include` (+1439 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1841 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **80 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `@nestjs/common` connect `@nestjs/common` to `app.e2e-spec.ts`, `PaymentsService`, `auth.module.ts`, `telegram-bot.service.ts`, `domain.module.ts`, `events.service.ts`, `Backend/package.json`, `invitations.service.ts`, `NotificationsService`, `events.controller.ts`, `health.controller.ts`, `registrations.service.ts`, `api/src/main.ts`, `policies.ts`, `rate-limit.guard.ts`?**
-  _High betweenness centrality (0.028) - this node is a cross-community bridge._
-- **Why does `AuthUser` connect `AuthUser` to `PaymentsService`, `DjsService`, `.create`, `telegram-bot.service.ts`, `CheckinService`, `events.service.ts`, `@nestjs/common`, `LocationsService`, `pricing-resolver.ts`, `registrations.service.ts`, `auth.module.ts`, `.wireHandlers`, `ListAuditLogsQueryDto`, `policies.ts`, `invitations.service.ts`, `CurrentUser`, `rate-limit.guard.ts`, `RegistrationsController`, `events.controller.ts`, `WaitlistController`?**
+- **Why does `@nestjs/common` connect `@nestjs/common` to `orcarail.provider.ts`, `vouchers.controller.ts`, `common/src/index.ts`, `events.service.ts`, `Backend/package.json`, `app.module.ts`, `files.controller.ts`, `registrations.service.ts`, `api/src/main.ts`, `PaymentsService`, `auth.service.ts`, `telegram-bot.service.ts`, `NotificationsService`, `self-only.guard.ts`, `app.e2e-spec.ts`, `auth.module.ts`, `rate-limit.guard.ts`, `events.controller.ts`, `health.controller.ts`?**
   _High betweenness centrality (0.027) - this node is a cross-community bridge._
+- **Why does `AuthUser` connect `AuthUser` to `DjsService`, `vouchers.controller.ts`, `common/src/index.ts`, `@nestjs/common`, `CheckinService`, `events.service.ts`, `app.module.ts`, `LocationsService`, `pricing-resolver.ts`, `registrations.service.ts`, `PaymentsService`, `auth.service.ts`, `telegram-bot.service.ts`, `ListAuditLogsQueryDto`, `.createIntent`, `self-only.guard.ts`, `auth.module.ts`, `CurrentUser`, `rate-limit.guard.ts`, `RegistrationsController`, `events.controller.ts`, `WaitlistController`?**
+  _High betweenness centrality (0.025) - this node is a cross-community bridge._
 - **Why does `scripts` connect `scripts` to `Backend/package.json`?**
-  _High betweenness centrality (0.013) - this node is a cross-community bridge._
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **What connects `extends`, `../../tsconfig.json`, `declaration` to the rest of the system?**
-  _1436 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1444 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `nest-cli.json` be split into smaller, more focused modules?**
   _Cohesion score 0.04810360777058279 - nodes in this community are weakly interconnected._
-- **Should `PaymentsService` be split into smaller, more focused modules?**
-  _Cohesion score 0.0673758865248227 - nodes in this community are weakly interconnected._
+- **Should `orcarail.provider.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.11822660098522167 - nodes in this community are weakly interconnected._
 - **Should `DjsService` be split into smaller, more focused modules?**
   _Cohesion score 0.11965811965811966 - nodes in this community are weakly interconnected._

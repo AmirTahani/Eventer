@@ -1,15 +1,41 @@
 import type { Metadata, Viewport } from 'next';
+import { Source_Sans_3, Source_Serif_4 } from 'next/font/google';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import { JsonLd } from '@/components/JsonLd';
+import { organizationJsonLd, websiteJsonLd } from '@/lib/structured-data';
+import { SITE_URL } from '@/lib/site';
 import { AppProviders } from './providers';
 
+const sourceSans = Source_Sans_3({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-source-sans',
+});
+
+const sourceSerif = Source_Serif_4({
+  subsets: ['latin'],
+  weight: ['500', '600', '700'],
+  display: 'swap',
+  variable: '--font-source-serif',
+});
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://eventer.world'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'Eventer',
     template: '%s · Eventer',
   },
   description:
-    'Invite-gated private events. Guests use Telegram; organizers use the web console.',
+    'Invite-only private events. Guests register and pay in Telegram. Hosts run the door from the web.',
+  openGraph: {
+    siteName: 'Eventer',
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
   appleWebApp: {
     capable: true,
     title: 'Eventer',
@@ -33,20 +59,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" style={{ height: '100%' }}>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Vazirmatn:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html
+      lang="en"
+      className={`${sourceSans.variable} ${sourceSerif.variable}`}
+      style={{ height: '100%' }}
+    >
       <body>
+        <JsonLd data={organizationJsonLd()} />
+        <JsonLd data={websiteJsonLd()} />
         <AppRouterCacheProvider>
           <AppProviders>{children}</AppProviders>
         </AppRouterCacheProvider>

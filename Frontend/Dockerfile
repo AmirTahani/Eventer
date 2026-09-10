@@ -7,6 +7,10 @@ RUN pnpm install --frozen-lockfile
 FROM node:20-slim AS build
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+ARG NEXT_PUBLIC_API_BASE_URL
+ARG NEXT_PUBLIC_TELEGRAM_BOT_USERNAME
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=$NEXT_PUBLIC_TELEGRAM_BOT_USERNAME
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm build

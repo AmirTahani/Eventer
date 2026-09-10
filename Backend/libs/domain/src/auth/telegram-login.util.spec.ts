@@ -39,7 +39,7 @@ describe('verifyTelegramLoginHash', () => {
     const base = {
       id: 42,
       first_name: 'Amir',
-      auth_date: Math.floor(Date.now() / 1000) - 120,
+      auth_date: Math.floor(Date.now() / 1000) - 90_000,
     };
     const hash = signTelegramLoginPayload(base, botToken);
     expect(verifyTelegramLoginHash({ ...base, hash }, botToken)).toEqual({

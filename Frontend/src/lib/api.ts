@@ -1,7 +1,20 @@
 import type { AuthUser } from './auth';
 
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4001';
+export function getApiBaseUrl(): string {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (
+      host === 'eventer.world' ||
+      host === 'www.eventer.world' ||
+      host === 'app.eventer.world'
+    ) {
+      return 'https://api.eventer.world';
+    }
+  }
+  return process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4001';
+}
+
+export const API_BASE_URL = getApiBaseUrl();
 
 export class ApiError extends Error {
   status: number;
@@ -36,7 +49,7 @@ export async function apiFetch<T>(
     headers.Authorization = `Bearer ${options.accessToken}`;
   }
 
-  const res = await fetch(`${API_BASE_URL}${path}`, {
+  const res = await fetch(`${getApiBaseUrl()}${path}`, {
     method: options.method ?? (options.body !== undefined ? 'POST' : 'GET'),
     headers,
     body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
@@ -93,6 +106,14 @@ export async function loginWithTelegram(
   payload: TelegramLoginPayload,
 ): Promise<LoginResponse> {
   return apiFetch<LoginResponse>('/auth/telegram-login', { body: payload });
+}
+
+export type PublicConfig = {
+  telegramBotUsername: string;
+};
+
+export async function fetchPublicConfig(): Promise<PublicConfig> {
+  return apiFetch<PublicConfig>('/config');
 }
 
 export type CreateInvitationInput = {

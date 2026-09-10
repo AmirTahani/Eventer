@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
-import type { Env } from '@eventer/common';
+import { parseCorsOrigins, type Env } from '@eventer/common';
 import { AppModule } from './app.module';
 import {
   initSentryStub,
@@ -29,7 +29,9 @@ async function bootstrap() {
   const config = app.get(ConfigService<Env, true>);
   initSentryStub(config.get('SENTRY_DSN', { infer: true }));
 
-  const corsOrigin = config.get('CORS_ORIGIN', { infer: true });
+  const corsOrigin = parseCorsOrigins(
+    config.get('CORS_ORIGIN', { infer: true }),
+  );
   app.enableCors({ origin: corsOrigin, credentials: true });
 
   const swaggerConfig = new DocumentBuilder()

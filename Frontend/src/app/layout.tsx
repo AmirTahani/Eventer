@@ -3,8 +3,13 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { AppProviders } from './providers';
 
 export const metadata: Metadata = {
-  title: 'Eventer',
-  description: 'Private event management dashboard',
+  metadataBase: new URL('https://eventer.world'),
+  title: {
+    default: 'Eventer',
+    template: '%s · Eventer',
+  },
+  description:
+    'Invite-gated private events. Guests use Telegram; organizers use the web console.',
   appleWebApp: {
     capable: true,
     title: 'Eventer',

@@ -8,15 +8,20 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { MarketingShell } from '@/components/MarketingShell';
 import { fetchPublicConfig } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import {
   audiences,
   faqs,
+  guestSection,
+  hero,
   howItWorksSteps,
+  organizerSection,
   privacyPoints,
+  trustIntro,
+  twoSurfaces,
 } from '@/lib/marketing-content';
 import {
   normalizeTelegramBotUsername,
@@ -83,10 +88,17 @@ function ConsoleStrip() {
       <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 700 }}>
         Hosts · Console
       </Typography>
-      <Typography variant="h3" component="p" sx={{ fontSize: '1.35rem', mt: 1, mb: 2 }}>
+      <Typography
+        variant="h3"
+        component="p"
+        sx={{ fontSize: '1.35rem', mt: 1, mb: 2 }}
+      >
         Friday night
       </Typography>
-      <Stack spacing={1.25} divider={<Box sx={{ borderBottom: 1, borderColor: 'divider' }} />}>
+      <Stack
+        spacing={1.25}
+        divider={<Box sx={{ borderBottom: 1, borderColor: 'divider' }} />}
+      >
         {rows.map(([label, value]) => (
           <Box
             key={label}
@@ -106,6 +118,76 @@ function ConsoleStrip() {
   );
 }
 
+function AudienceBand({
+  id,
+  title,
+  points,
+  cta,
+  tint,
+  mock,
+}: {
+  id: string;
+  title: string;
+  points: readonly string[];
+  cta: ReactNode;
+  tint: 'guest' | 'organizer';
+  mock: ReactNode;
+}) {
+  return (
+    <Box
+      id={id}
+      sx={{
+        py: { xs: 5, sm: 7 },
+        scrollMarginTop: 88,
+        bgcolor:
+          tint === 'guest'
+            ? (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(45, 212, 191, 0.06)'
+                  : 'rgba(15, 118, 110, 0.06)'
+            : 'action.hover',
+        borderTop: 1,
+        borderBottom: 1,
+        borderColor: 'divider',
+      }}
+    >
+      <Container maxWidth="lg">
+        <Box
+          sx={{
+            display: 'grid',
+            gap: { xs: 3, md: 5 },
+            gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1.05fr) minmax(0, 0.95fr)' },
+            alignItems: 'center',
+          }}
+        >
+          <Stack spacing={2} alignItems="flex-start">
+            <Typography
+              variant="h2"
+              sx={{ fontSize: { xs: '1.75rem', sm: '2.25rem' }, maxWidth: 520 }}
+            >
+              {title}
+            </Typography>
+            <Stack component="ul" spacing={1} sx={{ m: 0, pl: 2.25 }}>
+              {points.map((point) => (
+                <Typography
+                  key={point}
+                  component="li"
+                  color="text.secondary"
+                  sx={{ lineHeight: 1.6 }}
+                >
+                  {point}
+                </Typography>
+              ))}
+            </Stack>
+            {cta}
+          </Stack>
+          <Box>{mock}</Box>
+        </Box>
+      </Container>
+    </Box>
+  );
+}
+
 export function HomeLanding({
   botUsername,
 }: {
@@ -113,6 +195,7 @@ export function HomeLanding({
 }) {
   const { accessToken, ready } = useAuth();
   const signedIn = ready && Boolean(accessToken);
+  const organizeHref = signedIn ? '/dashboard' : '/login';
   const [bot, setBot] = useState(
     () =>
       normalizeTelegramBotUsername(botUsername) ??
@@ -129,7 +212,7 @@ export function HomeLanding({
         if (name) setBot(name);
       })
       .catch(() => {
-        /* keep the CTA hidden until we have a real username */
+        /* keep guest CTA hidden until we have a real username */
       });
   }, [bot]);
 
@@ -137,104 +220,99 @@ export function HomeLanding({
     <MarketingShell>
       <Box component="main" id="main-content" tabIndex={-1}>
         <Container
-          maxWidth="lg"
-          sx={{ pt: { xs: 6, sm: 10 }, pb: { xs: 6, sm: 10 } }}
+          maxWidth="md"
+          sx={{ pt: { xs: 7, sm: 11 }, pb: { xs: 6, sm: 8 } }}
         >
-          <Box
-            sx={{
-              display: 'grid',
-              gap: { xs: 3, md: 2 },
-              rowGap: { md: 2 },
-              gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1.1fr) minmax(0, 0.9fr)' },
-              gridTemplateAreas: {
-                xs: '"hero" "telegram" "console"',
-                md: '"hero telegram" "copy console"',
-              },
-              alignItems: 'stretch',
-            }}
-          >
-            <Stack spacing={3} alignItems="flex-start" sx={{ gridArea: 'hero', pb: { md: 4 } }}>
-              <Typography
-                variant="h1"
-                sx={{
-                  fontSize: { xs: '2.4rem', sm: '3.4rem', md: '4rem' },
-                  lineHeight: 1.05,
-                  maxWidth: 640,
-                }}
-              >
-                The room stays closed until you open it.
-              </Typography>
-              <Typography
-                color="text.secondary"
-                sx={{
-                  fontSize: { xs: '1.05rem', sm: '1.2rem' },
-                  maxWidth: 520,
-                  lineHeight: 1.65,
-                }}
-              >
-                Guests register and pay in Telegram. You run the door from the
-                web. The address stays hidden until you release it.
-              </Typography>
-              <Stack
-                direction={{ xs: 'column', sm: 'row' }}
-                spacing={1.25}
-                sx={{ width: { xs: '100%', sm: 'auto' }, pt: 1 }}
-              >
-                <Button
-                  component={Link}
-                  href={signedIn ? '/dashboard' : '/login'}
-                  variant="contained"
-                  size="large"
-                  fullWidth
-                  sx={{ width: { sm: 'auto' } }}
-                >
-                  {signedIn ? 'Open dashboard' : 'Hosts sign in'}
-                </Button>
-                {bot ? (
-                  <Button
-                    component="a"
-                    href={telegramBotUrl(bot)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    variant="outlined"
-                    size="large"
-                    fullWidth
-                    startIcon={<TelegramIcon />}
-                    sx={{ width: { sm: 'auto' } }}
-                  >
-                    Open Telegram
-                  </Button>
-                ) : null}
-              </Stack>
-              <Typography variant="body2" color="text.secondary">
-                No public signup. Guests need an invitation.
-              </Typography>
-            </Stack>
-            <Box sx={{ gridArea: 'telegram' }}>
-              <TelegramThread />
-            </Box>
-            <Box sx={{ gridArea: 'console' }}>
-              <ConsoleStrip />
-            </Box>
-            <Paper
+          <Stack spacing={3} alignItems="flex-start">
+            <Typography
+              variant="h1"
               sx={{
-                gridArea: 'copy',
-                p: { xs: 3, sm: 4 },
-                display: { xs: 'none', md: 'flex' },
-                flexDirection: 'column',
-                justifyContent: 'center',
+                fontSize: { xs: '2.4rem', sm: '3.5rem', md: '4rem' },
+                lineHeight: 1.05,
+                maxWidth: 720,
               }}
             >
-              <Typography variant="h2" sx={{ fontSize: '1.75rem', mb: 1.5 }}>
-                Two surfaces. One closed room.
+              {hero.headline}
+            </Typography>
+            <Typography
+              color="text.secondary"
+              sx={{
+                fontSize: { xs: '1.05rem', sm: '1.2rem' },
+                maxWidth: 540,
+                lineHeight: 1.65,
+              }}
+            >
+              {hero.subhead}
+            </Typography>
+            <Button
+              component={Link}
+              href={organizeHref}
+              variant="contained"
+              size="large"
+            >
+              {signedIn ? 'Open dashboard' : organizerSection.cta}
+            </Button>
+            <Typography variant="body2" color="text.secondary">
+              {hero.note}
+            </Typography>
+          </Stack>
+        </Container>
+
+        <AudienceBand
+          id="for-guests"
+          title={guestSection.title}
+          points={guestSection.points}
+          tint="guest"
+          mock={<TelegramThread />}
+          cta={
+            bot ? (
+              <Button
+                component="a"
+                href={telegramBotUrl(bot)}
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="contained"
+                size="large"
+                startIcon={<TelegramIcon />}
+              >
+                {guestSection.cta}
+              </Button>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                Guest access is by invitation in Telegram.
               </Typography>
-              <Typography color="text.secondary">
-                Guests never install another app. Hosts get capacity, waitlist,
-                location release, and check-in in the console — with an audit
-                trail behind privileged actions.
-              </Typography>
-            </Paper>
-          </Box>
+            )
+          }
+        />
+
+        <AudienceBand
+          id="for-organizers"
+          title={organizerSection.title}
+          points={organizerSection.points}
+          tint="organizer"
+          mock={<ConsoleStrip />}
+          cta={
+            <Button
+              component={Link}
+              href={organizeHref}
+              variant="contained"
+              size="large"
+            >
+              {signedIn ? 'Open dashboard' : organizerSection.cta}
+            </Button>
+          }
+        />
+
+        <Container maxWidth="md" sx={{ py: { xs: 6, sm: 9 } }}>
+          <Typography
+            variant="h2"
+            sx={{ fontSize: { xs: '1.75rem', sm: '2.25rem' }, mb: 1.5 }}
+          >
+            {twoSurfaces.title}
+          </Typography>
+          <Typography color="text.secondary" sx={{ maxWidth: 560, lineHeight: 1.65 }}>
+            {twoSurfaces.body}
+          </Typography>
         </Container>
 
         <Container
@@ -242,7 +320,10 @@ export function HomeLanding({
           maxWidth="lg"
           sx={{ pb: { xs: 6, sm: 10 }, scrollMarginTop: 88 }}
         >
-          <Typography variant="h2" sx={{ fontSize: { xs: '1.75rem', sm: '2.25rem' }, mb: 3 }}>
+          <Typography
+            variant="h2"
+            sx={{ fontSize: { xs: '1.75rem', sm: '2.25rem' }, mb: 3 }}
+          >
             Invite, register, arrive
           </Typography>
           <Box
@@ -267,7 +348,10 @@ export function HomeLanding({
         </Container>
 
         <Container maxWidth="lg" sx={{ pb: { xs: 6, sm: 10 } }}>
-          <Typography variant="h2" sx={{ fontSize: { xs: '1.75rem', sm: '2.25rem' }, mb: 3 }}>
+          <Typography
+            variant="h2"
+            sx={{ fontSize: { xs: '1.75rem', sm: '2.25rem' }, mb: 3 }}
+          >
             Built for rooms that should stay private
           </Typography>
           <Box
@@ -294,12 +378,14 @@ export function HomeLanding({
 
         <Container maxWidth="lg" sx={{ pb: { xs: 6, sm: 10 } }}>
           <Paper sx={{ p: { xs: 3, sm: 5 } }}>
-            <Typography variant="h2" sx={{ fontSize: { xs: '1.75rem', sm: '2.25rem' }, mb: 1 }}>
-              An unlisted link is not private
+            <Typography
+              variant="h2"
+              sx={{ fontSize: { xs: '1.75rem', sm: '2.25rem' }, mb: 1 }}
+            >
+              {trustIntro.title}
             </Typography>
             <Typography color="text.secondary" sx={{ mb: 4, maxWidth: 560 }}>
-              Anyone who forwards an Eventbrite or Luma URL can register. Eventer
-              does not work that way.
+              {trustIntro.body}
             </Typography>
             <Box
               sx={{
@@ -325,7 +411,10 @@ export function HomeLanding({
           maxWidth="md"
           sx={{ pb: { xs: 8, sm: 12 }, scrollMarginTop: 88 }}
         >
-          <Typography variant="h2" sx={{ fontSize: { xs: '1.75rem', sm: '2.25rem' }, mb: 3 }}>
+          <Typography
+            variant="h2"
+            sx={{ fontSize: { xs: '1.75rem', sm: '2.25rem' }, mb: 3 }}
+          >
             Questions
           </Typography>
           <Stack spacing={3}>

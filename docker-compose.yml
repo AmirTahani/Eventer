@@ -3,10 +3,8 @@ services:
     image: postgres:16
     environment:
       POSTGRES_USER: eventer
-      POSTGRES_PASSWORD: eventer
+      POSTGRES_PASSWORD: e1c0cf434108bf3d672a9f9b40866ea74a1c31e0402b05527afd94d651093bcc
       POSTGRES_DB: events
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -17,8 +15,6 @@ services:
 
   redis:
     image: redis:7
-    ports:
-      - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -39,7 +35,7 @@ services:
     command: node dist/apps/api/main.js
     env_file: ./Backend/.env
     environment:
-      DATABASE_URL: postgresql://eventer:eventer@postgres:5432/events?schema=public
+      DATABASE_URL: postgresql://eventer:e1c0cf434108bf3d672a9f9b40866ea74a1c31e0402b05527afd94d651093bcc@postgres:5432/events?schema=public
       REDIS_URL: redis://redis:6379
     depends_on:
       postgres:
@@ -47,7 +43,7 @@ services:
       redis:
         condition: service_healthy
     ports:
-      - "3000:3000"
+      - "127.0.0.1:4001:4001"
     profiles: ["full"]
 
   bot:
@@ -56,7 +52,8 @@ services:
     command: node dist/apps/bot/main.js
     env_file: ./Backend/.env
     environment:
-      DATABASE_URL: postgresql://eventer:eventer@postgres:5432/events?schema=public
+      NODE_ENV: development
+      DATABASE_URL: postgresql://eventer:e1c0cf434108bf3d672a9f9b40866ea74a1c31e0402b05527afd94d651093bcc@postgres:5432/events?schema=public
       REDIS_URL: redis://redis:6379
     depends_on:
       postgres:
@@ -64,14 +61,14 @@ services:
       redis:
         condition: service_healthy
     profiles: ["full"]
-
+    
   worker:
     build:
       context: ./Backend
     command: node dist/apps/worker/main.js
     env_file: ./Backend/.env
     environment:
-      DATABASE_URL: postgresql://eventer:eventer@postgres:5432/events?schema=public
+      DATABASE_URL: postgresql://eventer:e1c0cf434108bf3d672a9f9b40866ea74a1c31e0402b05527afd94d651093bcc@postgres:5432/events?schema=public
       REDIS_URL: redis://redis:6379
     depends_on:
       postgres:
@@ -85,11 +82,13 @@ services:
       context: ./Frontend
     env_file: ./Frontend/.env
     environment:
-      NEXT_PUBLIC_API_BASE_URL: http://localhost:3000
+      NEXT_PUBLIC_API_BASE_URL: https://api.eventer.world
+      HOSTNAME: "0.0.0.0"
+      PORT: "4000"
     depends_on:
       - api
     ports:
-      - "3001:3000"
+      - "127.0.0.1:4000:4000"
     profiles: ["full"]
 
 volumes:

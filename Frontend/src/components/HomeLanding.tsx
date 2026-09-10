@@ -1,5 +1,7 @@
 'use client';
 
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -9,6 +11,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 import { useEffect, useState, type ReactNode } from 'react';
+import { MarketingFaqAccordion } from '@/components/MarketingFaqAccordion';
 import { MarketingShell } from '@/components/MarketingShell';
 import { fetchPublicConfig } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
@@ -20,6 +23,7 @@ import {
   howItWorksSteps,
   organizerSection,
   privacyPoints,
+  securitySection,
   trustIntro,
   twoSurfaces,
 } from '@/lib/marketing-content';
@@ -156,7 +160,10 @@ function AudienceBand({
           sx={{
             display: 'grid',
             gap: { xs: 3, md: 5 },
-            gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1.05fr) minmax(0, 0.95fr)' },
+            gridTemplateColumns: {
+              xs: '1fr',
+              md: 'minmax(0, 1.05fr) minmax(0, 0.95fr)',
+            },
             alignItems: 'center',
           }}
         >
@@ -184,6 +191,85 @@ function AudienceBand({
           <Box>{mock}</Box>
         </Box>
       </Container>
+    </Box>
+  );
+}
+
+function FlowArrow({ orientation }: { orientation: 'horizontal' | 'vertical' }) {
+  const Icon =
+    orientation === 'horizontal' ? ArrowForwardIcon : ArrowDownwardIcon;
+  return (
+    <Box
+      aria-hidden
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'primary.main',
+        flexShrink: 0,
+        py: orientation === 'vertical' ? 0.5 : 0,
+        px: orientation === 'horizontal' ? 0.5 : 0,
+      }}
+    >
+      <Icon sx={{ fontSize: 28 }} />
+    </Box>
+  );
+}
+
+function HowItWorksFlow() {
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', md: 'row' },
+        alignItems: 'stretch',
+      }}
+    >
+      {howItWorksSteps.map((step, index) => (
+        <Box
+          key={step.title}
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            alignItems: { xs: 'stretch', md: 'center' },
+            flex: { md: 1 },
+            minWidth: 0,
+          }}
+        >
+          <Paper
+            sx={{
+              p: { xs: 2.5, sm: 3 },
+              flex: 1,
+              height: '100%',
+              border: 1,
+              borderColor: 'divider',
+              boxShadow: 'none',
+            }}
+          >
+            <Typography variant="h3" sx={{ fontSize: '1.35rem', mb: 1 }}>
+              {step.title}
+            </Typography>
+            <Typography color="text.secondary" sx={{ lineHeight: 1.6 }}>
+              {step.body}
+            </Typography>
+          </Paper>
+          {index < howItWorksSteps.length - 1 ? (
+            <>
+              <Box
+                sx={{
+                  display: { xs: 'flex', md: 'none' },
+                  justifyContent: 'center',
+                }}
+              >
+                <FlowArrow orientation="vertical" />
+              </Box>
+              <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+                <FlowArrow orientation="horizontal" />
+              </Box>
+            </>
+          ) : null}
+        </Box>
+      ))}
     </Box>
   );
 }
@@ -310,7 +396,10 @@ export function HomeLanding({
           >
             {twoSurfaces.title}
           </Typography>
-          <Typography color="text.secondary" sx={{ maxWidth: 560, lineHeight: 1.65 }}>
+          <Typography
+            color="text.secondary"
+            sx={{ maxWidth: 560, lineHeight: 1.65 }}
+          >
             {twoSurfaces.body}
           </Typography>
         </Container>
@@ -326,25 +415,7 @@ export function HomeLanding({
           >
             Invite, register, arrive
           </Typography>
-          <Box
-            sx={{
-              display: 'grid',
-              gap: { xs: 3, md: 5 },
-              gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
-            }}
-          >
-            {howItWorksSteps.map((step, index) => (
-              <Box key={step.title}>
-                <Typography color="primary" sx={{ fontWeight: 700, mb: 1 }}>
-                  {index + 1}
-                </Typography>
-                <Typography variant="h3" sx={{ fontSize: '1.35rem', mb: 1 }}>
-                  {step.title}
-                </Typography>
-                <Typography color="text.secondary">{step.body}</Typography>
-              </Box>
-            ))}
-          </Box>
+          <HowItWorksFlow />
         </Container>
 
         <Container maxWidth="lg" sx={{ pb: { xs: 6, sm: 10 } }}>
@@ -407,6 +478,52 @@ export function HomeLanding({
         </Container>
 
         <Container
+          id="security"
+          maxWidth="lg"
+          sx={{ pb: { xs: 6, sm: 10 }, scrollMarginTop: 88 }}
+        >
+          <Typography
+            variant="h2"
+            sx={{ fontSize: { xs: '1.75rem', sm: '2.25rem' }, mb: 1.5 }}
+          >
+            {securitySection.title}
+          </Typography>
+          <Typography
+            color="text.secondary"
+            sx={{ mb: 4, maxWidth: 640, lineHeight: 1.65 }}
+          >
+            {securitySection.body}
+          </Typography>
+          <Box
+            sx={{
+              display: 'grid',
+              gap: 2.5,
+              gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+            }}
+          >
+            {securitySection.points.map((item) => (
+              <Paper
+                key={item.title}
+                sx={{
+                  p: { xs: 2.5, sm: 3 },
+                  border: 1,
+                  borderColor: 'divider',
+                  boxShadow: 'none',
+                  height: '100%',
+                }}
+              >
+                <Typography variant="h3" sx={{ fontSize: '1.2rem', mb: 1 }}>
+                  {item.title}
+                </Typography>
+                <Typography color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                  {item.body}
+                </Typography>
+              </Paper>
+            ))}
+          </Box>
+        </Container>
+
+        <Container
           id="faq"
           maxWidth="md"
           sx={{ pb: { xs: 8, sm: 12 }, scrollMarginTop: 88 }}
@@ -417,16 +534,7 @@ export function HomeLanding({
           >
             Questions
           </Typography>
-          <Stack spacing={3}>
-            {faqs.map((item) => (
-              <Box key={item.question} component="section">
-                <Typography variant="h3" sx={{ fontSize: '1.15rem', mb: 0.75 }}>
-                  {item.question}
-                </Typography>
-                <Typography color="text.secondary">{item.answer}</Typography>
-              </Box>
-            ))}
-          </Stack>
+          <MarketingFaqAccordion items={faqs} />
         </Container>
       </Box>
     </MarketingShell>

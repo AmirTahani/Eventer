@@ -53,7 +53,7 @@ test.describe('Marketing homepage', () => {
     ).toHaveAttribute('href', '/contact');
     await page.goto('/faq', { waitUntil: 'domcontentloaded' });
     await expect(
-      page.getByRole('heading', { name: /how do guests get in/i }),
+      page.getByRole('button', { name: /how do guests get in/i }),
     ).toBeVisible();
   });
 

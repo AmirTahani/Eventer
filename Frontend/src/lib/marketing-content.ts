@@ -80,6 +80,29 @@ export const trustIntro = {
   body: 'Anyone who forwards an Eventbrite or Luma URL can register. Eventer does not work that way.',
 } as const;
 
+export const securitySection = {
+  title: 'Content stays closed. Paths stay encrypted.',
+  body: "Eventer is built so guest lists, tickets, and venue details never sit on a public page. Guest traffic moves through Telegram's encrypted channel; the host console is served over HTTPS.",
+  points: [
+    {
+      title: 'Encrypted guest channel',
+      body: 'Invites, registration, payment status, and tickets travel in Telegram — an encrypted chat path guests already trust. Nothing is published as an open web listing.',
+    },
+    {
+      title: 'Encrypted host console',
+      body: 'Organizers sign in over HTTPS. Session traffic to the console is encrypted in transit. Privileged actions leave an audit trail instead of a public feed.',
+    },
+    {
+      title: 'Access-gated content',
+      body: 'Event details, capacity, waitlists, and addresses are visible only to invited guests and authorized hosts. Search engines do not get event pages to index.',
+    },
+    {
+      title: 'End-to-end closed room',
+      body: 'From invite to check-in, sensitive content stays inside authenticated channels — Telegram for guests, the encrypted console for hosts — not on a shareable public RSVP page.',
+    },
+  ],
+} as const;
+
 export const faqs = [
   {
     question: 'How do guests get in?',
@@ -105,6 +128,11 @@ export const faqs = [
     question: 'Where do guests pay and get tickets?',
     answer:
       'In Telegram. A pending payment holds the seat. The ticket issues after payment confirms, then checks in with a QR code.',
+  },
+  {
+    question: 'How is content secured?',
+    answer:
+      "Guest invites, tickets, and messages stay in Telegram's encrypted channel. The host console runs over HTTPS. Event lists and addresses are access-gated — never published as public pages.",
   },
   {
     question: 'Who is the web console for?',

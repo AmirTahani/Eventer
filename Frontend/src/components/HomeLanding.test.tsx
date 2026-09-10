@@ -90,10 +90,16 @@ describe('HomeLanding', () => {
       screen.getByRole('heading', { name: /invite, register, arrive/i }),
     ).toBeInTheDocument();
     expect(
+      screen.getByRole('heading', { name: /content stays closed/i }),
+    ).toBeInTheDocument();
+    expect(
       screen.getByRole('heading', { name: /an unlisted link is not private/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: /how do guests get in/i }),
+      screen.getByRole('button', { name: /how do guests get in/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /how is content secured/i }),
     ).toBeInTheDocument();
   });
 });

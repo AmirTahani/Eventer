@@ -1,37 +1,33 @@
 'use client';
 
-import Typography from '@mui/material/Typography';
+import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Link from 'next/link';
+import { MobileFab } from '@/components/MobileFab';
+import { PageHeader } from '@/components/PageHeader';
 
 export default function EventsPage() {
   return (
     <Stack spacing={2}>
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        spacing={2}
-        justifyContent="space-between"
-        alignItems={{ xs: 'stretch', sm: 'center' }}
-      >
-        <Typography
-          variant="h3"
-          sx={{ fontSize: { xs: '1.75rem', md: '2.25rem' } }}
-        >
-          Events
-        </Typography>
-        <Button
-          component={Link}
-          href="/dashboard/events/new"
-          variant="contained"
-          sx={{ alignSelf: { xs: 'stretch', sm: 'center' } }}
-        >
-          Create Event
-        </Button>
-      </Stack>
-      <Typography color="text.secondary">
-        Events visible to you will load from GET /events once authenticated.
-      </Typography>
+      <PageHeader
+        title="Events"
+        subtitle="Events visible to you will load from GET /events once authenticated."
+        action={
+          <Button
+            component={Link}
+            href="/dashboard/events/new"
+            variant="contained"
+          >
+            Create Event
+          </Button>
+        }
+      />
+      <MobileFab
+        href="/dashboard/events/new"
+        label="New event"
+        icon={<AddIcon sx={{ mr: 0.75 }} />}
+      />
     </Stack>
   );
 }

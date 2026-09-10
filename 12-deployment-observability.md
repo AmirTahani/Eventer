@@ -61,7 +61,7 @@ services:
     command: node dist/apps/api/main.js
     env_file: ./Backend/.env
     depends_on: [postgres, redis]
-    ports: ["3000:3000"]
+    ports: ["4001:4001"]
   bot:
     build: ./Backend
     command: node dist/apps/bot/main.js
@@ -76,7 +76,7 @@ services:
     build: ./Frontend
     env_file: ./Frontend/.env
     depends_on: [api]
-    ports: ["3001:3000"]
+    ports: ["4000:4000"]
 volumes:
   pgdata:
 ```

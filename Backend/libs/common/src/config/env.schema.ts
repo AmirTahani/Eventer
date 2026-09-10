@@ -16,7 +16,7 @@ export const envSchema = z
     NODE_ENV: z
       .enum(['development', 'test', 'production'])
       .default('development'),
-    PORT: z.coerce.number().int().positive().default(3000),
+    PORT: z.coerce.number().int().positive().default(4001),
     DATABASE_URL: z.string().min(1),
     REDIS_URL: z.string().min(1).default('redis://localhost:6379'),
     JWT_SECRET: z.string().min(16).default('dev-jwt-secret-change-me'),
@@ -36,7 +36,7 @@ export const envSchema = z
       .min(8)
       .default('dev-payment-webhook-secret'),
     TICKET_QR_SECRET: z.string().min(16).default('dev-ticket-qr-secret-change'),
-    CORS_ORIGIN: z.string().default('http://localhost:3001'),
+    CORS_ORIGIN: z.string().default('http://localhost:4000'),
     SENTRY_DSN: z.string().optional(),
     R2_ACCOUNT_ID: z.string().optional(),
     R2_ACCESS_KEY_ID: z.string().optional(),

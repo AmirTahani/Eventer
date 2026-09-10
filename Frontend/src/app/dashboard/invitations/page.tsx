@@ -1,5 +1,6 @@
 'use client';
 
+import AddIcon from '@mui/icons-material/Add';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -14,6 +15,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { ApiError, createInvitation, type CreateInvitationResult } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { MobileFab } from '@/components/MobileFab';
+import { PageHeader } from '@/components/PageHeader';
 
 export default function InvitationsPage() {
   const { accessToken, user, hasRole, ready } = useAuth();
@@ -67,34 +70,23 @@ export default function InvitationsPage() {
   }
 
   return (
-    <Stack spacing={3}>
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        spacing={2}
-        justifyContent="space-between"
-        alignItems={{ xs: 'stretch', sm: 'flex-start' }}
-      >
-        <Box>
-          <Typography variant="h3" sx={{ fontSize: { xs: '1.75rem', md: '2.25rem' } }}>
-            Invitations
-          </Typography>
-          <Typography color="text.secondary" sx={{ mt: 0.75, maxWidth: 520 }}>
-            Create Telegram deep links for new guests. Share the link so they can
-            join through the bot.
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          onClick={() => {
-            setError(null);
-            setOpen(true);
-          }}
-          disabled={!ready}
-          sx={{ alignSelf: { xs: 'stretch', sm: 'center' }, whiteSpace: 'nowrap' }}
-        >
-          New invitation
-        </Button>
-      </Stack>
+    <Stack spacing={3} sx={{ pb: { xs: 8, md: 0 } }}>
+      <PageHeader
+        title="Invitations"
+        subtitle="Create Telegram deep links for new guests. Share the link so they can join through the bot."
+        action={
+          <Button
+            variant="contained"
+            onClick={() => {
+              setError(null);
+              setOpen(true);
+            }}
+            disabled={!ready}
+          >
+            New invitation
+          </Button>
+        }
+      />
 
       {!ready ? null : !accessToken ? (
         <Alert
@@ -172,6 +164,13 @@ export default function InvitationsPage() {
         onClose={() => !submitting && setOpen(false)}
         fullWidth
         maxWidth="sm"
+        fullScreen={false}
+        PaperProps={{
+          sx: {
+            m: { xs: 1.5, sm: 4 },
+            width: { xs: 'calc(100% - 24px)', sm: undefined },
+          },
+        }}
       >
         <DialogTitle>New invitation</DialogTitle>
         <DialogContent>
@@ -202,6 +201,16 @@ export default function InvitationsPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <MobileFab
+        label="Invite"
+        icon={<AddIcon sx={{ mr: 0.75 }} />}
+        disabled={!ready}
+        onClick={() => {
+          setError(null);
+          setOpen(true);
+        }}
+      />
     </Stack>
   );
 }

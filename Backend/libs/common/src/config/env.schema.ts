@@ -36,7 +36,11 @@ export const envSchema = z
       .min(8)
       .default('dev-payment-webhook-secret'),
     TICKET_QR_SECRET: z.string().min(16).default('dev-ticket-qr-secret-change'),
-    CORS_ORIGIN: z.string().default('http://localhost:4000'),
+    CORS_ORIGIN: z
+      .string()
+      .default(
+        'http://localhost:4000,https://eventer.world,https://www.eventer.world,https://app.eventer.world',
+      ),
     SENTRY_DSN: z.string().optional(),
     R2_ACCOUNT_ID: z.string().optional(),
     R2_ACCESS_KEY_ID: z.string().optional(),

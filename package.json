@@ -1,0 +1,9 @@
+{
+  "name": "eventer",
+  "private": true,
+  "scripts": {
+    "deploy": "bash scripts/deploy.sh",
+    "deploy:skip-pull": "bash scripts/deploy.sh --skip-pull",
+    "deploy:web-only": "bash scripts/deploy.sh --skip-migrate"
+  }
+}

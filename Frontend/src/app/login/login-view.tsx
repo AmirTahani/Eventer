@@ -84,11 +84,17 @@ export function LoginView({
     void fetchPublicConfig()
       .then((config) => {
         const name = normalizeTelegramBotUsername(config.telegramBotUsername);
-        if (name) setBot(name);
+        if (name) {
+          setBot(name);
+          return;
+        }
+        setError(
+          'Telegram bot username is missing on the API. Set TELEGRAM_BOT_USERNAME.',
+        );
       })
       .catch(() => {
         setError(
-          'Could not load the Telegram bot username. Check that the API is reachable.',
+          'Could not load the Telegram bot username. Check that the API is reachable and CORS_ORIGIN includes this site (eventer.world).',
         );
       });
   }, [bot]);

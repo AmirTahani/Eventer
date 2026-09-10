@@ -91,19 +91,14 @@ describe('validateEnv', () => {
     );
   });
 
-  it('accepts a custom ORCARAIL_BASE_URL for self-host', () => {
+  it('defaults CORS to local and production Eventer hosts', () => {
     const env = validateEnv({
       DATABASE_URL: 'postgresql://eventer@localhost:5432/events',
-      PAYMENT_PROVIDER: 'orcarail',
-      ORCARAIL_API_KEY: 'ak',
-      ORCARAIL_API_SECRET: 'sk',
-      ORCARAIL_TOKEN_ID: 'tok',
-      ORCARAIL_NETWORK_ID: 'net',
-      ORCARAIL_RETURN_URL: 'https://app.example/payments/return',
-      ORCARAIL_BASE_URL: 'https://payments.internal/api/v1',
-      ORCARAIL_CANCEL_URL: 'https://app.example/payments/cancel',
+      JWT_SECRET: 'dev-jwt-secret-change-me',
+      REFRESH_TOKEN_SECRET: 'dev-refresh-secret-change-me',
     });
-    expect(env.ORCARAIL_BASE_URL).toBe('https://payments.internal/api/v1');
-    expect(env.ORCARAIL_CANCEL_URL).toBe('https://app.example/payments/cancel');
+    expect(env.CORS_ORIGIN).toContain('http://localhost:4000');
+    expect(env.CORS_ORIGIN).toContain('https://eventer.world');
+    expect(env.CORS_ORIGIN).toContain('https://app.eventer.world');
   });
 });

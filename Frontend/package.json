@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit",
     "codegen": "openapi-typescript ../Backend/openapi/openapi.json -o src/generated/api.d.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:all": "pnpm test && pnpm test:e2e"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -29,6 +32,7 @@
     "stylis-plugin-rtl": "^2.1.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.4",

@@ -31,7 +31,7 @@ export default function OpenGraphImage() {
               maxWidth: 900,
             }}
           >
-            The room stays closed until you open it.
+            Stay closed until you open the door.
           </div>
           <div style={{ fontSize: 28, color: '#9AA6B8', maxWidth: 760 }}>
             Invite-only events. Guests in Telegram. Hosts on the web.

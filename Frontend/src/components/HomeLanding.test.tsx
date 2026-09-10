@@ -34,7 +34,7 @@ describe('HomeLanding', () => {
     });
   });
 
-  it('introduces Eventer and links to host sign in', () => {
+  it('shows editorial hero and organize CTA', () => {
     render(
       <AppProviders>
         <HomeLanding botUsername="EventBot" />
@@ -43,48 +43,57 @@ describe('HomeLanding', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: /the room stays closed until you open it/i,
+        name: /stay closed until you open the door/i,
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getAllByRole('link', { name: /hosts sign in/i })[0],
+      screen.getAllByRole('link', { name: /organize an event/i })[0],
     ).toHaveAttribute('href', '/login');
-    expect(screen.getByRole('link', { name: /open telegram/i })).toHaveAttribute(
+  });
+
+  it('shows guest join CTA when bot username is set', () => {
+    render(
+      <AppProviders>
+        <HomeLanding botUsername="EventBot" />
+      </AppProviders>,
+    );
+    expect(screen.getByRole('link', { name: /join an event/i })).toHaveAttribute(
       'href',
       'https://t.me/EventBot',
     );
   });
 
-  it('hides the Telegram CTA when username is a placeholder', () => {
+  it('hides guest join CTA when username is a placeholder', () => {
     render(
       <AppProviders>
         <HomeLanding botUsername="REPLACE_WITH_BOT_USERNAME" />
       </AppProviders>,
     );
     expect(
-      screen.queryByRole('link', { name: /open telegram/i }),
+      screen.queryByRole('link', { name: /join an event/i }),
     ).not.toBeInTheDocument();
   });
 
-  it('shows how-it-works, audience, and FAQ', () => {
+  it('shows guest, organizer, how-it-works, and FAQ sections', () => {
     render(
       <AppProviders>
         <HomeLanding botUsername="EventBot" />
       </AppProviders>,
     );
     expect(
+      screen.getByRole('heading', { name: /you're invited in telegram/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /you run the door from the web/i }),
+    ).toBeInTheDocument();
+    expect(
       screen.getByRole('heading', { name: /invite, register, arrive/i }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /^Invite$/i })).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { name: /an unlisted link is not private/i }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { name: /how do guests get in/i }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /privacy/i })).toHaveAttribute(
-      'href',
-      '/privacy',
-    );
   });
 });

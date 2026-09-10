@@ -1,44 +1,44 @@
 # Graph Report - Eventer  (2026-09-10)
 
 ## Corpus Check
-- 314 files · ~164,724 words
+- 333 files · ~167,906 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2761 nodes · 4165 edges · 265 communities (183 shown, 80 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 105 edges (avg confidence: 0.8)
+- 2834 nodes · 4315 edges · 272 communities (190 shown, 80 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 105 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `7383151e`
+- Built from commit: `34b96687`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- AuthUser
+- EventsService
 - nest-cli.json
 - api/tsconfig.app.json
-- orcarail.provider.ts
+- PaymentsService
 - DjsService
 - vouchers.controller.ts
-- common/src/index.ts
-- @nestjs/common
+- bot.module.ts
+- domain/src/index.ts
 - CheckinService
 - events.service.ts
 - Backend/package.json
-- app.module.ts
+- @nestjs/common
 - devDependencies
 - scripts
 - compilerOptions
 - LocationsService
-- files.controller.ts
+- FilesService
 - DashboardShell.tsx
-- pricing-resolver.ts
 - registrations.service.ts
+- WaitlistService
 - dependencies
 - Frontend/package.json
 - HealthController
-- api/src/main.ts
+- StructuredLogger
 - PageHeader.tsx
 - 10.3 Events
 - api.ts
@@ -47,15 +47,15 @@
 - .telegramLogin
 - providers.tsx
 - devDependencies
-- PaymentsService
+- PrismaService
 - jest
 - CreateEventDto
 - 3. System & Module Architecture
 - auth.service.ts
-- class-validator
+- events.controller.ts
 - UpdateEventDto
 - ReplacePricingTiersDto
-- UpdateDjDto
+- HomeLanding.tsx
 - RejectRegistrationDto
 - telegram-bot.service.ts
 - NotificationsService
@@ -73,15 +73,15 @@
 - 7. Design System — Material UI, Luxury Navy Palette
 - bot/tsconfig.app.json
 - login-view.tsx
-- ListQueryDto
+- AuditController
 - worker/tsconfig.app.json
 - common/tsconfig.lib.json
 - db/tsconfig.lib.json
-- self-only.guard.ts
+- AuthUser
 - api.d.ts
 - domain/tsconfig.lib.json
 - Backend/eslint.config.mjs
-- app.e2e-spec.ts
+- api/src/main.ts
 - Frontend/eslint.config.mjs
 - Animation and Motion
 - Private Event Platform — Project Documentation
@@ -117,24 +117,24 @@
 - Typography
 - UI Design Brain
 - RegistrationsController
-- Effective UI Design
+- Critical Rules (NEVER Violate)
 - 6. Rendering Performance
 - Common Print Style Mistakes
 - 3. Server-Side Performance
 - React Best Practices
 - Sections
-- events.controller.ts
+- CreateAccessGrantDto
 - Common Mistakes
 - Scroll Patterns
 - Common Dark Mode Mistakes
-- Critical Rules (NEVER Violate)
-- health.controller.ts
+- Favicons
+- scripts
 - WaitlistController
 - Prefer Intrinsic Responsiveness Over Breakpoints
 - Tables and Data Display
 - Scroll-Driven Animations
 - Cascade Layers (`@layer`)
-- UpdateLocationDto
+- TicketsController
 - Effective UI Design
 - Responsive Images
 - Use a Type Scale to Set Font Sizes
@@ -277,7 +277,14 @@
 - server-parallel-nested-fetching.md
 - server-serialization.md
 - _template.md
-- auth.tsx
+- isAdmin
+- Semantic Page Structure
+- opengraph-image.tsx
+- Image SEO
+- Internal Linking
+- Structured Data (JSON-LD)
+- apple-icon.tsx
+- deploy.sh
 
 ## God Nodes (most connected - your core abstractions)
 1. `AuthUser` - 115 edges
@@ -292,25 +299,25 @@
 10. `scripts` - 27 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `completeLogin()` --calls--> `loginWithTelegram()`  [EXTRACTED]
+  Frontend/src/app/login/login-view.tsx → Frontend/src/lib/api.ts
 - `AuditController` --references--> `Roles()`  [EXTRACTED]
   Backend/apps/api/src/audit/audit.controller.ts → Backend/libs/domain/src/auth/roles.guard.ts
 - `CheckinController` --references--> `Roles()`  [EXTRACTED]
   Backend/apps/api/src/checkin/checkin.controller.ts → Backend/libs/domain/src/auth/roles.guard.ts
+- `bootstrap()` --calls--> `StructuredLogger`  [EXTRACTED]
+  Backend/apps/api/src/main.ts → Backend/apps/api/src/observability/structured-logger.ts
 - `build()` --calls--> `AuthService`  [EXTRACTED]
   Backend/libs/domain/src/auth/auth.service.spec.ts → Backend/libs/domain/src/auth/auth.service.ts
-- `service()` --calls--> `EventVisibilityService`  [EXTRACTED]
-  Backend/libs/domain/src/events/event-visibility.service.spec.ts → Backend/libs/domain/src/events/event-visibility.service.ts
-- `buildProvider()` --calls--> `OrcaRailPaymentProvider`  [EXTRACTED]
-  Backend/libs/domain/src/payments/orcarail.provider.spec.ts → Backend/libs/domain/src/payments/orcarail.provider.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (265 total, 80 thin omitted)
+## Communities (272 total, 80 thin omitted)
 
-### Community 0 - "AuthUser"
-Cohesion: 0.21
-Nodes (5): AuthUser, moneyDecimal(), eventDetailInclude(), EventsService, Injectable
+### Community 0 - "EventsService"
+Cohesion: 0.18
+Nodes (4): moneyDecimal(), eventDetailInclude(), EventsService, Injectable
 
 ### Community 1 - "nest-cli.json"
 Cohesion: 0.05
@@ -320,41 +327,41 @@ Nodes (46): compilerOptions, entryFile, root, sourceRoot, type, compilerOptions,
 Cohesion: 0.25
 Nodes (7): compilerOptions, declaration, outDir, exclude, extends, include, ../../tsconfig.json
 
-### Community 3 - "orcarail.provider.ts"
-Cohesion: 0.12
-Nodes (14): mapOrcaRailWebhook(), OrcaRailPaymentProvider, OrcaRailProviderConfig, OrcaRailWebhookBody, buildProvider(), CreatePaymentIntentInput, CreatePaymentIntentResult, MockPaymentProvider (+6 more)
+### Community 3 - "PaymentsService"
+Cohesion: 0.09
+Nodes (16): mapOrcaRailWebhook(), OrcaRailPaymentProvider, OrcaRailProviderConfig, OrcaRailWebhookBody, buildProvider(), CreatePaymentIntentInput, CreatePaymentIntentResult, MockPaymentProvider (+8 more)
 
 ### Community 4 - "DjsService"
-Cohesion: 0.12
-Nodes (14): DjsController, ApiBearerAuth, ApiTags, Body, Controller, Delete, Get, Param (+6 more)
+Cohesion: 0.07
+Nodes (25): ListQueryDto, IsInt, IsOptional, IsString, Max, Min, Type, DjsController (+17 more)
 
 ### Community 5 - "vouchers.controller.ts"
-Cohesion: 0.11
-Nodes (16): AcceptInvitationDto, IsOptional, IsString, MinLength, CreateInvitationDto, IsOptional, IsString, MinLength (+8 more)
+Cohesion: 0.10
+Nodes (19): AcceptInvitationDto, IsOptional, IsString, MinLength, CreateInvitationDto, IsOptional, IsString, MinLength (+11 more)
 
-### Community 6 - "common/src/index.ts"
-Cohesion: 0.09
-Nodes (19): BotModule, Module, Module, WorkerModule, CommonModule, Global, Module, envSchema (+11 more)
+### Community 6 - "bot.module.ts"
+Cohesion: 0.12
+Nodes (14): BotModule, Module, Module, WorkerModule, CommonModule, Global, Module, DbModule (+6 more)
 
-### Community 7 - "@nestjs/common"
+### Community 7 - "domain/src/index.ts"
 Cohesion: 0.11
-Nodes (30): AuditModule, Module, AuthModule, Module, CheckinModule, Module, nanoid(), DjsModule (+22 more)
+Nodes (30): AuditModule, Module, AuthModule, Module, CheckinModule, Module, DjsModule, Module (+22 more)
 
 ### Community 8 - "CheckinService"
 Cohesion: 0.18
 Nodes (9): CheckinController, ApiBearerAuth, ApiTags, Body, Controller, Post, UseGuards, CheckinService (+1 more)
 
 ### Community 9 - "events.service.ts"
-Cohesion: 0.11
-Nodes (21): PrismaService, Injectable, AuditAppendInput, AuditService, Injectable, canManageEvent(), hasRole(), isAdmin() (+13 more)
+Cohesion: 0.13
+Nodes (14): AuditAppendInput, AuditService, Injectable, decodeCursor(), encodeCursor(), IdCursor, EventVisibilityService, EventVisibilitySubject (+6 more)
 
 ### Community 10 - "Backend/package.json"
-Cohesion: 0.06
-Nodes (33): description, eslint, @types/node, typescript, license, name, private, version (+25 more)
+Cohesion: 0.05
+Nodes (37): description, eslint, @types/node, typescript, license, name, private, version (+29 more)
 
-### Community 11 - "app.module.ts"
-Cohesion: 0.10
-Nodes (20): ManualDto, ScanDto, IsString, IsUUID, CreateIntentDto, IsUUID, TicketsController, ApiBearerAuth (+12 more)
+### Community 11 - "@nestjs/common"
+Cohesion: 0.15
+Nodes (14): AppModule, Module, ManualDto, ScanDto, IsString, IsUUID, CreateIntentDto, IsUUID (+6 more)
 
 ### Community 12 - "devDependencies"
 Cohesion: 0.07
@@ -369,24 +376,24 @@ Cohesion: 0.07
 Nodes (26): compilerOptions, allowSyntheticDefaultImports, baseUrl, declaration, emitDecoratorMetadata, esModuleInterop, experimentalDecorators, forceConsistentCasingInFileNames (+18 more)
 
 ### Community 15 - "LocationsService"
-Cohesion: 0.11
-Nodes (14): LocationsController, ApiBearerAuth, ApiTags, Body, Controller, Delete, Get, Param (+6 more)
+Cohesion: 0.08
+Nodes (21): IsNumber, IsObject, IsOptional, IsString, MinLength, Type, ValidateIf, UpdateLocationDto (+13 more)
 
-### Community 16 - "files.controller.ts"
-Cohesion: 0.14
-Nodes (13): IsOptional, IsString, MinLength, UploadUrlDto, FilesController, ApiBearerAuth, ApiTags, Body (+5 more)
+### Community 16 - "FilesService"
+Cohesion: 0.12
+Nodes (14): IsOptional, IsString, MinLength, UploadUrlDto, FilesController, ApiBearerAuth, ApiTags, Body (+6 more)
 
 ### Community 17 - "DashboardShell.tsx"
+Cohesion: 0.19
+Nodes (16): metadata, DashboardShell(), DrawerNav(), moreIcons, MoreSheet(), tabIcons, useAuth(), allNav (+8 more)
+
+### Community 18 - "registrations.service.ts"
+Cohesion: 0.14
+Nodes (16): DuplicateRegistrationException, InsufficientCapacityException, moneyMultiply(), moneyString(), ActivePrice, PriceIncreaseHint, PricingTierLike, resolveActivePrice() (+8 more)
+
+### Community 19 - "WaitlistService"
 Cohesion: 0.18
-Nodes (16): DashboardHomePage(), DashboardShell(), DrawerNav(), moreIcons, MoreSheet(), tabIcons, useAuth(), allNav (+8 more)
-
-### Community 18 - "pricing-resolver.ts"
-Cohesion: 0.22
-Nodes (8): moneyMultiply(), moneyString(), ActivePrice, PriceIncreaseHint, PricingTierLike, resolveActivePrice(), resolvePriceIncreaseHint(), validatePricingTiersInput()
-
-### Community 19 - "registrations.service.ts"
-Cohesion: 0.11
-Nodes (13): DuplicateRegistrationException, InsufficientCapacityException, EnqueueNotificationInput, CapacityDecision, decideCapacityOutcome(), lockEventRow(), sumActiveReservations(), RegistrationsService (+5 more)
+Nodes (7): canManageEvent(), decideCapacityOutcome(), lockEventRow(), RegistrationsService, Injectable, Injectable, WaitlistService
 
 ### Community 20 - "dependencies"
 Cohesion: 0.09
@@ -400,10 +407,6 @@ Nodes (23): eslint, @types/node, typescript, name, private, version, rootDir, @e
 Cohesion: 0.27
 Nodes (8): ApiOperation, HealthController, ApiOkResponse, ApiTags, Controller, Get, Header, HealthCheck
 
-### Community 23 - "api/src/main.ts"
-Cohesion: 0.13
-Nodes (8): AppModule, Module, bootstrap(), initSentryStub(), StructuredLogger, Injectable, parseCorsOrigins(), cookie-parser
-
 ### Community 24 - "PageHeader.tsx"
 Cohesion: 0.16
 Nodes (4): MobileFab(), Props, PageHeader(), Props
@@ -413,32 +416,32 @@ Cohesion: 0.06
 Nodes (31): 10.1 Auth, 10.2 Vouchers / Invitations, 10.3 Events, 10.4 Registrations, 10.5 Payments, 10.6 Tickets & Check-in, 10.7 Audit logs, 10. API Reference — Detailed Request/Response Contracts (+23 more)
 
 ### Community 26 - "api.ts"
-Cohesion: 0.18
-Nodes (15): InvitationsPage(), handleCreate(), completeLogin(), API_BASE_URL, ApiError, apiFetch(), createInvitation(), CreateInvitationInput (+7 more)
+Cohesion: 0.19
+Nodes (15): InvitationsPage(), handleCreate(), API_BASE_URL, ApiError, apiFetch(), createInvitation(), CreateInvitationInput, CreateInvitationResult (+7 more)
 
 ### Community 27 - "compilerOptions"
 Cohesion: 0.11
 Nodes (18): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+10 more)
 
 ### Community 28 - "vitest"
-Cohesion: 0.17
-Nodes (11): replace, CancelContent(), searchParams, PaymentCancelView(), PaymentReturnView(), resolvePaymentIntentId(), ReturnContent(), searchParams (+3 more)
+Cohesion: 0.15
+Nodes (12): DashboardHomePage(), replace, CancelContent(), searchParams, PaymentCancelView(), PaymentReturnView(), resolvePaymentIntentId(), ReturnContent() (+4 more)
 
 ### Community 29 - ".telegramLogin"
-Cohesion: 0.12
-Nodes (14): AuthController, ApiOkResponse, ApiTags, Body, Controller, HttpCode, Post, TelegramLoginDto (+6 more)
+Cohesion: 0.17
+Nodes (11): ApiOkResponse, Body, HttpCode, Post, TelegramLoginDto, IsInt, IsOptional, IsString (+3 more)
 
 ### Community 30 - "providers.tsx"
-Cohesion: 0.12
-Nodes (18): steps, Props, ThemedApp(), Props, ThemeModeSwitch(), ColorModeContext, ColorModeContextValue, ColorModeProvider() (+10 more)
+Cohesion: 0.09
+Nodes (24): steps, Props, ThemedApp(), footerLinks, Props, ThemeModeSwitch(), AuthContext, AuthContextValue (+16 more)
 
 ### Community 31 - "devDependencies"
 Cohesion: 0.04
 Nodes (43): dependencies, @emotion/cache, @emotion/react, @emotion/styled, @mui/icons-material, @mui/material, @mui/material-nextjs, @mui/x-data-grid (+35 more)
 
-### Community 32 - "PaymentsService"
-Cohesion: 0.14
-Nodes (7): Get, PaymentsService, Injectable, signTicketQrToken(), TicketsService, Injectable, verifyTicketQrToken()
+### Community 32 - "PrismaService"
+Cohesion: 0.17
+Nodes (6): PrismaService, Injectable, signTicketQrToken(), TicketsService, Injectable, verifyTicketQrToken()
 
 ### Community 33 - "jest"
 Cohesion: 0.14
@@ -453,8 +456,12 @@ Cohesion: 0.15
 Nodes (12): 3.10 i18n, 3.11 Security checklist (mitigations), 3.1 High-level shape, 3.2 Module boundaries, 3.3 Representative API design, 3.4 Telegram architecture, 3.5 Background jobs & Redis, 3.6 Authentication & authorization (+4 more)
 
 ### Community 36 - "auth.service.ts"
-Cohesion: 0.21
-Nodes (7): AuthService, build(), Injectable, signTelegramLoginPayload(), TelegramLoginPayload, verifyTelegramLoginHash(), @nestjs/jwt
+Cohesion: 0.20
+Nodes (10): AuthController, ApiTags, Controller, AuthService, build(), Injectable, signTelegramLoginPayload(), TelegramLoginPayload (+2 more)
+
+### Community 37 - "events.controller.ts"
+Cohesion: 0.20
+Nodes (5): CancelEventDto, IsOptional, IsString, class-transformer, class-validator
 
 ### Community 38 - "UpdateEventDto"
 Cohesion: 0.17
@@ -464,20 +471,20 @@ Nodes (12): IsArray, IsBoolean, IsDateString, IsEnum, IsInt, IsOptional, IsStrin
 Cohesion: 0.20
 Nodes (10): PricingTierDto, ReplacePricingTiersDto, IsArray, IsBoolean, IsDateString, IsOptional, IsString, MinLength (+2 more)
 
-### Community 40 - "UpdateDjDto"
-Cohesion: 0.33
-Nodes (5): IsOptional, IsString, MinLength, ValidateIf, UpdateDjDto
+### Community 40 - "HomeLanding.tsx"
+Cohesion: 0.24
+Nodes (9): audiences, faqs, guestSection, hero, howItWorksSteps, organizerSection, privacyPoints, trustIntro (+1 more)
 
 ### Community 41 - "RejectRegistrationDto"
 Cohesion: 0.40
 Nodes (4): RejectRegistrationDto, IsOptional, IsString, MaxLength
 
 ### Community 42 - "telegram-bot.service.ts"
-Cohesion: 0.09
-Nodes (10): Get, UseGuards, parseInviteStartPayload(), BotContext, SessionData, TelegramBotService, Injectable, Injectable (+2 more)
+Cohesion: 0.08
+Nodes (14): ApiBearerAuth, ApiTags, Controller, Get, UseGuards, UsersController, parseInviteStartPayload(), BotContext (+6 more)
 
 ### Community 43 - "NotificationsService"
-Cohesion: 0.13
+Cohesion: 0.12
 Nodes (8): Injectable, WorkerJobsService, NotificationsService, Injectable, EventRemindersService, REMINDER_OFFSETS, ReminderOffsetKey, Injectable
 
 ### Community 44 - "12. Deployment, Docker & Observability"
@@ -489,8 +496,8 @@ Cohesion: 0.03
 Nodes (62): Accordion, Alert, Avatar, Badge, Breadcrumbs, Button, Button group, Card (+54 more)
 
 ### Community 46 - "ListAuditLogsQueryDto"
-Cohesion: 0.11
-Nodes (16): ApiPropertyOptional, AuditController, ApiBearerAuth, ApiTags, Controller, Get, Query, UseGuards (+8 more)
+Cohesion: 0.22
+Nodes (9): ApiPropertyOptional, ListAuditLogsQueryDto, IsInt, IsOptional, IsString, IsUUID, Max, Min (+1 more)
 
 ### Community 47 - "Backend/README.md"
 Cohesion: 0.20
@@ -533,12 +540,12 @@ Cohesion: 0.25
 Nodes (7): compilerOptions, declaration, outDir, exclude, extends, include, ../../tsconfig.json
 
 ### Community 57 - "login-view.tsx"
-Cohesion: 0.21
-Nodes (15): LoginView(), Window, LoginPage(), HomePage(), metadata, features, HomeLanding(), steps (+7 more)
+Cohesion: 0.25
+Nodes (12): LoginView(), completeLogin(), Window, LoginPage(), metadata, HomeLanding(), TelegramLoginPayload, normalizeTelegramBotUsername() (+4 more)
 
-### Community 58 - "ListQueryDto"
-Cohesion: 0.29
-Nodes (7): ListQueryDto, IsInt, IsOptional, IsString, Max, Min, Type
+### Community 58 - "AuditController"
+Cohesion: 0.22
+Nodes (7): AuditController, ApiBearerAuth, ApiTags, Controller, Get, Query, UseGuards
 
 ### Community 59 - "worker/tsconfig.app.json"
 Cohesion: 0.25
@@ -552,6 +559,10 @@ Nodes (7): compilerOptions, declaration, outDir, exclude, extends, include, ../.
 Cohesion: 0.25
 Nodes (7): compilerOptions, declaration, outDir, exclude, extends, include, ../../tsconfig.json
 
+### Community 62 - "AuthUser"
+Cohesion: 0.15
+Nodes (8): Get, Param, Post, AuthUser, PoliciesService, Injectable, SelfOnlyGuard, Injectable
+
 ### Community 63 - "api.d.ts"
 Cohesion: 0.33
 Nodes (5): components, $defs, operations, paths, webhooks
@@ -563,6 +574,10 @@ Nodes (7): compilerOptions, declaration, outDir, exclude, extends, include, ../.
 ### Community 65 - "Backend/eslint.config.mjs"
 Cohesion: 0.50
 Nodes (3): @eslint/js, globals, typescript-eslint
+
+### Community 66 - "api/src/main.ts"
+Cohesion: 0.33
+Nodes (3): bootstrap(), initSentryStub(), parseCorsOrigins()
 
 ### Community 68 - "Animation and Motion"
 Cohesion: 0.04
@@ -581,8 +596,8 @@ Cohesion: 0.33
 Nodes (5): 4.1 Core tables (abbreviated column lists — types/constraints noted), 4.2 Mermaid ERD, 4.3 Capacity concurrency strategy (the critical part), 4.4 Key indexes (beyond PKs/FKs), 4. Database Schema
 
 ### Community 75 - "auth.module.ts"
-Cohesion: 0.11
-Nodes (16): Env, BotServiceGuard, Injectable, JwtPayload, JwtStrategy, Injectable, PoliciesService, Injectable (+8 more)
+Cohesion: 0.10
+Nodes (17): HealthModule, Module, metricsRegistry, Env, envSchema, optionalNonEmpty, optionalUrl, validateEnv() (+9 more)
 
 ### Community 76 - "Eventer"
 Cohesion: 0.33
@@ -621,8 +636,8 @@ Cohesion: 0.05
 Nodes (42): 1. Raw Values, 2. Primitive Colours, 3. Semantic Colours (Tokens), 7 Colour Variations (Solid Palette — OKLCH), Add a Tinge of Colour to Black and White (Tinted Neutrals), Add Depth Using Colour and Shadows, Adjust Photo Colour Temperature, APCA (Accessible Perceptual Contrast Algorithm) (+34 more)
 
 ### Community 86 - "SEO for Frontend"
-Cohesion: 0.05
-Nodes (41): Alt Text for SEO, Anchor Text, Breadcrumb Navigation, BreadcrumbList Example, Canonical Tag, Chapter Summary, CLS — Cumulative Layout Shift (< 0.1), Common Schema Types for UI Projects (+33 more)
+Cohesion: 0.12
+Nodes (17): Canonical Tag, Chapter Summary, CLS — Cumulative Layout Shift (< 0.1), Core Web Vitals, Document Head and Meta Tags, INP — Interaction to Next Paint (< 200ms), Language and Localisation, LCP — Largest Contentful Paint (< 2.5s) (+9 more)
 
 ### Community 87 - "Common Mistakes"
 Cohesion: 0.05
@@ -633,8 +648,8 @@ Cohesion: 0.06
 Nodes (34): 1. Validate on Submit of the Form, 2. Validate After People Leave a Field (On Blur), 3. Validate Instantly as People Type, Break Up Long Forms into Multiple Steps, Chapter Summary, Checkbox Usage, Choose Your Form Validation Approach, Display Hints Above Form Fields (+26 more)
 
 ### Community 89 - "CurrentUser"
-Cohesion: 0.21
-Nodes (15): EventsController, ApiBearerAuth, ApiTags, Body, Controller, Delete, Get, Param (+7 more)
+Cohesion: 0.18
+Nodes (17): Post, EventsController, ApiBearerAuth, ApiTags, Body, Controller, Delete, Get (+9 more)
 
 ### Community 90 - "Copywriting"
 Cohesion: 0.09
@@ -684,9 +699,9 @@ Nodes (12): Anti-Patterns to Avoid, Component Quick Reference, Core Principles, 
 Cohesion: 0.26
 Nodes (8): RegistrationsController, ApiBearerAuth, ApiTags, Body, Controller, Param, Post, UseGuards
 
-### Community 102 - "Effective UI Design"
-Cohesion: 0.15
-Nodes (13): 1. Minimise Usability Risks, 2. Have a Logical Reason for Every Design Detail, 3. Minimise Interaction Cost, 4. Minimise Cognitive Load, 5. Create a Design System, Colour Palette Template (OKLCH), Core Principles (ALWAYS Apply), Design Checklist (+5 more)
+### Community 102 - "Critical Rules (NEVER Violate)"
+Cohesion: 0.09
+Nodes (22): 1. Minimise Usability Risks, 2. Have a Logical Reason for Every Design Detail, 3. Minimise Interaction Cost, 4. Minimise Cognitive Load, 5. Create a Design System, Buttons, Colour, Colour Palette Template (OKLCH) (+14 more)
 
 ### Community 104 - "6. Rendering Performance"
 Cohesion: 0.17
@@ -708,9 +723,9 @@ Nodes (9): 4.1 Deduplicate Global Event Listeners, 4.2 Use Passive Event Listene
 Cohesion: 0.20
 Nodes (9): 1. Eliminating Waterfalls (async), 2. Bundle Size Optimization (bundle), 3. Server-Side Performance (server), 4. Client-Side Data Fetching (client), 5. Re-render Optimization (rerender), 6. Rendering Performance (rendering), 7. JavaScript Performance (js), 8. Advanced Patterns (advanced) (+1 more)
 
-### Community 109 - "events.controller.ts"
-Cohesion: 0.24
-Nodes (7): CancelEventDto, IsOptional, IsString, CreateAccessGrantDto, IsEnum, IsString, MinLength
+### Community 109 - "CreateAccessGrantDto"
+Cohesion: 0.50
+Nodes (4): CreateAccessGrantDto, IsEnum, IsString, MinLength
 
 ### Community 110 - "Common Mistakes"
 Cohesion: 0.22
@@ -724,17 +739,17 @@ Nodes (8): Back-to-Top Buttons, Browser Support Status, Chapter Summary, Positio
 Cohesion: 0.22
 Nodes (9): Common Dark Mode Mistakes, Mistake 1: Just inverting colours, Mistake 2: Forgetting images, Mistake 3: Insufficient contrast, Mistake 4: Ignoring system preference, Mistake 5: Pure black backgrounds, Mistake 6: Not desaturating accent colours, Mistake 7: Forgetting scrollbars and form controls (+1 more)
 
-### Community 113 - "Critical Rules (NEVER Violate)"
-Cohesion: 0.22
-Nodes (9): Buttons, Colour, Critical Rules (NEVER Violate), Favicons, Forms, Icons, Layout, SEO (+1 more)
+### Community 113 - "Favicons"
+Cohesion: 0.29
+Nodes (7): Favicons, Generating Favicons, HTML Markup, SVG Favicon with Dark Mode, The Five Icons, Web Manifest for PWAs, What Is Outdated
 
-### Community 114 - "health.controller.ts"
-Cohesion: 0.28
-Nodes (4): HealthModule, Module, metricsRegistry, @nestjs/terminus
+### Community 114 - "scripts"
+Cohesion: 0.29
+Nodes (6): name, private, scripts, deploy, deploy:skip-pull, deploy:web-only
 
 ### Community 115 - "WaitlistController"
-Cohesion: 0.22
-Nodes (7): ApiBearerAuth, ApiTags, Controller, Param, Post, UseGuards, WaitlistController
+Cohesion: 0.33
+Nodes (5): ApiBearerAuth, ApiTags, Controller, UseGuards, WaitlistController
 
 ### Community 116 - "Prefer Intrinsic Responsiveness Over Breakpoints"
 Cohesion: 0.25
@@ -752,9 +767,9 @@ Nodes (8): Animation Ranges, Critical Ordering Rule, Fallback for Unsupported Br
 Cohesion: 0.25
 Nodes (8): Cascade Layers (`@layer`), Importing into Layers, Nested Layers, Ordering Rules, Recommended Layer Structure, `revert-layer`, The `!important` Reversal, Three Ways to Create Layers
 
-### Community 120 - "UpdateLocationDto"
-Cohesion: 0.25
-Nodes (8): IsNumber, IsObject, IsOptional, IsString, MinLength, Type, ValidateIf, UpdateLocationDto
+### Community 120 - "TicketsController"
+Cohesion: 0.33
+Nodes (5): TicketsController, ApiBearerAuth, ApiTags, Controller, UseGuards
 
 ### Community 121 - "Effective UI Design"
 Cohesion: 0.29
@@ -813,8 +828,8 @@ Cohesion: 0.29
 Nodes (7): CreateLocationDto, IsNumber, IsObject, IsOptional, IsString, MinLength, Type
 
 ### Community 135 - "app/layout.tsx"
-Cohesion: 0.29
-Nodes (4): nextConfig, metadata, viewport, next
+Cohesion: 0.08
+Nodes (28): nextConfig, FaqPage(), metadata, metadata, metadata, RootLayout(), sourceSans, sourceSerif (+20 more)
 
 ### Community 136 - "Handle Device Safe Areas"
 Cohesion: 0.33
@@ -1036,29 +1051,49 @@ Nodes (3): Combining Typefaces, Evoke Emotion Using a Second Typeface for Headin
 Cohesion: 0.67
 Nodes (3): Enable Kerning, Kerning and Letter Spacing, Letter Spacing (Tracking) Guidelines
 
-### Community 264 - "auth.tsx"
-Cohesion: 0.32
-Nodes (5): AuthContext, AuthContextValue, AuthProvider(), AuthUser, user
+### Community 264 - "isAdmin"
+Cohesion: 0.40
+Nodes (3): hasRole(), isAdmin(), base
+
+### Community 265 - "Semantic Page Structure"
+Cohesion: 0.40
+Nodes (5): Breadcrumb Navigation, Landmark Elements, Logical Heading Hierarchy, One `<h1>` Per Page, Semantic Page Structure
+
+### Community 266 - "opengraph-image.tsx"
+Cohesion: 0.40
+Nodes (3): alt, contentType, size
+
+### Community 267 - "Image SEO"
+Cohesion: 0.50
+Nodes (4): Alt Text for SEO, File Names, Image Format and Performance, Image SEO
+
+### Community 268 - "Internal Linking"
+Cohesion: 0.50
+Nodes (4): Anchor Text, Footer and Sidebar Links, Internal Linking, Site Architecture
+
+### Community 269 - "Structured Data (JSON-LD)"
+Cohesion: 0.50
+Nodes (4): BreadcrumbList Example, Common Schema Types for UI Projects, Implementation, Structured Data (JSON-LD)
 
 ## Knowledge Gaps
-- **1444 isolated node(s):** `extends`, `../../tsconfig.json`, `declaration`, `outDir`, `include` (+1439 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1841 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **1465 isolated node(s):** `extends`, `../../tsconfig.json`, `declaration`, `outDir`, `include` (+1460 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1871 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **80 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `@nestjs/common` connect `@nestjs/common` to `orcarail.provider.ts`, `vouchers.controller.ts`, `common/src/index.ts`, `events.service.ts`, `Backend/package.json`, `app.module.ts`, `files.controller.ts`, `registrations.service.ts`, `api/src/main.ts`, `PaymentsService`, `auth.service.ts`, `telegram-bot.service.ts`, `NotificationsService`, `self-only.guard.ts`, `app.e2e-spec.ts`, `auth.module.ts`, `rate-limit.guard.ts`, `events.controller.ts`, `health.controller.ts`?**
-  _High betweenness centrality (0.027) - this node is a cross-community bridge._
-- **Why does `AuthUser` connect `AuthUser` to `DjsService`, `vouchers.controller.ts`, `common/src/index.ts`, `@nestjs/common`, `CheckinService`, `events.service.ts`, `app.module.ts`, `LocationsService`, `pricing-resolver.ts`, `registrations.service.ts`, `PaymentsService`, `auth.service.ts`, `telegram-bot.service.ts`, `ListAuditLogsQueryDto`, `.createIntent`, `self-only.guard.ts`, `auth.module.ts`, `CurrentUser`, `rate-limit.guard.ts`, `RegistrationsController`, `events.controller.ts`, `WaitlistController`?**
-  _High betweenness centrality (0.025) - this node is a cross-community bridge._
+- **Why does `@nestjs/common` connect `@nestjs/common` to `PrismaService`, `api/src/main.ts`, `PaymentsService`, `auth.service.ts`, `vouchers.controller.ts`, `events.controller.ts`, `bot.module.ts`, `domain/src/index.ts`, `events.service.ts`, `telegram-bot.service.ts`, `auth.module.ts`, `NotificationsService`, `Backend/package.json`, `FilesService`, `registrations.service.ts`, `AuthUser`, `rate-limit.guard.ts`?**
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+- **Why does `AuthUser` connect `AuthUser` to `EventsService`, `DjsService`, `vouchers.controller.ts`, `bot.module.ts`, `CheckinService`, `events.service.ts`, `isAdmin`, `@nestjs/common`, `LocationsService`, `registrations.service.ts`, `WaitlistService`, `PrismaService`, `auth.service.ts`, `events.controller.ts`, `telegram-bot.service.ts`, `.createIntent`, `AuditController`, `auth.module.ts`, `CurrentUser`, `rate-limit.guard.ts`, `RegistrationsController`?**
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
 - **Why does `scripts` connect `scripts` to `Backend/package.json`?**
   _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **What connects `extends`, `../../tsconfig.json`, `declaration` to the rest of the system?**
-  _1444 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1465 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `nest-cli.json` be split into smaller, more focused modules?**
   _Cohesion score 0.04810360777058279 - nodes in this community are weakly interconnected._
-- **Should `orcarail.provider.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.11822660098522167 - nodes in this community are weakly interconnected._
+- **Should `PaymentsService` be split into smaller, more focused modules?**
+  _Cohesion score 0.0945945945945946 - nodes in this community are weakly interconnected._
 - **Should `DjsService` be split into smaller, more focused modules?**
-  _Cohesion score 0.11965811965811966 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07254623044096728 - nodes in this community are weakly interconnected._

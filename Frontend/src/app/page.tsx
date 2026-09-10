@@ -8,12 +8,12 @@ import { SITE_URL } from '@/lib/site';
 export const metadata: Metadata = {
   title: 'Invite-only private events on Telegram',
   description:
-    'Guests register and pay in Telegram. Hosts run capacity, tickets, and check-in from the web. The venue stays hidden until you release it.',
+    'Stay closed until you open the door. Guests register in Telegram. Hosts run the night from the web. The venue stays hidden until you release it.',
   alternates: { canonical: SITE_URL },
   openGraph: {
-    title: 'Invite-only private events on Telegram',
+    title: 'Stay closed until you open the door',
     description:
-      'Guests register and pay in Telegram. Hosts run the door from the web. Address hidden until you release it.',
+      'Invite-only events. Guests in Telegram. Hosts on the web. Address hidden until you release it.',
     url: SITE_URL,
     siteName: 'Eventer',
     type: 'website',
@@ -21,9 +21,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Invite-only private events on Telegram',
+    title: 'Stay closed until you open the door',
     description:
-      'Guests register and pay in Telegram. Hosts run the door from the web.',
+      'Invite-only events. Guests in Telegram. Hosts on the web.',
   },
 };
 

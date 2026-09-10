@@ -240,16 +240,16 @@
     "semantic_hash": "135d54e0f574696e7f3024599630873e"
   },
   "Backend/apps/api/test/app.e2e-spec.ts": {
-    "mtime": 1786840936.2903547,
-    "seen": 1789046543.770336,
-    "ast_hash": "61be750b386431811174fe0ac92f5af2",
-    "semantic_hash": "61be750b386431811174fe0ac92f5af2"
+    "mtime": 1789052299.0506575,
+    "seen": 1789052960.910145,
+    "ast_hash": "bdfd392c9035741e14785f6474ab0379",
+    "semantic_hash": ""
   },
   "Backend/apps/api/test/jest-e2e.json": {
-    "mtime": 1786841037.410078,
-    "seen": 1789046543.770337,
-    "ast_hash": "9f2f5b0e1da31d7b04e205c944e85e8d",
-    "semantic_hash": "9f2f5b0e1da31d7b04e205c944e85e8d"
+    "mtime": 1789052248.7521946,
+    "seen": 1789052960.9101472,
+    "ast_hash": "594b52e0d1d6aaf672cbfeac0f792310",
+    "semantic_hash": ""
   },
   "Backend/apps/api/tsconfig.app.json": {
     "mtime": 1786840833.664305,
@@ -462,9 +462,9 @@
     "semantic_hash": "774dfb4a0f88debe1d1b5dd251020ba5"
   },
   "Backend/libs/domain/src/auth/telegram-login.util.spec.ts": {
-    "mtime": 1789051606.1185312,
-    "seen": 1789051701.319642,
-    "ast_hash": "5cff7b5e0948467db2aa6e63e55e3c59",
+    "mtime": 1789052095.240898,
+    "seen": 1789052960.912408,
+    "ast_hash": "7a6e6df2a81767e54fd0e31d294fbd0e",
     "semantic_hash": ""
   },
   "Backend/libs/domain/src/auth/telegram-login.util.ts": {
@@ -828,10 +828,10 @@
     "semantic_hash": "6b74d568929690b9bc8da8dea6abe1d6"
   },
   "Frontend/package.json": {
-    "mtime": 1789051420.2813056,
-    "seen": 1789051701.321151,
-    "ast_hash": "0b721694417e5a8cd5ece40daa6aacbf",
-    "semantic_hash": "0b721694417e5a8cd5ece40daa6aacbf"
+    "mtime": 1789052075.962358,
+    "seen": 1789052960.916687,
+    "ast_hash": "7d95208815d52744bcebd2558e4b29a2",
+    "semantic_hash": ""
   },
   "Frontend/src/app/dashboard/audit/page.tsx": {
     "mtime": 1789051420.2816498,
@@ -936,10 +936,10 @@
     "semantic_hash": "da1821a696caadc96031e462430ae85e"
   },
   "Frontend/src/app/payments/return/page.test.tsx": {
-    "mtime": 1786884572.1478903,
-    "seen": 1789046543.7703922,
-    "ast_hash": "f1b2413ec9308a9f256081906dd1fca2",
-    "semantic_hash": "f1b2413ec9308a9f256081906dd1fca2"
+    "mtime": 1789052191.634078,
+    "seen": 1789052960.917793,
+    "ast_hash": "5ae8b170bf8410957dd679d061612603",
+    "semantic_hash": ""
   },
   "Frontend/src/app/payments/return/page.tsx": {
     "mtime": 1786885259.6823394,
@@ -984,10 +984,10 @@
     "semantic_hash": "2b3185f7dfe6b8fb98969867726ff7ee"
   },
   "Frontend/src/lib/api.test.ts": {
-    "mtime": 1786885259.6829813,
-    "seen": 1789046543.770396,
-    "ast_hash": "88456de3e1ca4a51ce81a29f9cb4a32a",
-    "semantic_hash": "88456de3e1ca4a51ce81a29f9cb4a32a"
+    "mtime": 1789051837.098665,
+    "seen": 1789052960.9182239,
+    "ast_hash": "1d351120333bd5906d6d7b2f6cfca94e",
+    "semantic_hash": ""
   },
   "Frontend/src/lib/api.ts": {
     "mtime": 1789051606.1199882,
@@ -1038,9 +1038,9 @@
     "semantic_hash": "b4e5cf16e20fc3c2b45fa4b9718c4f59"
   },
   "Frontend/src/components/HomeLanding.test.tsx": {
-    "mtime": 1789051606.1196723,
-    "seen": 1789051701.3213718,
-    "ast_hash": "ea8f2c370f6d910581bfde7f3a75326e",
+    "mtime": 1789051882.6778104,
+    "seen": 1789052960.9179578,
+    "ast_hash": "053656cbbfc1fe0141b708ee14d9cdaa",
     "semantic_hash": ""
   },
   "Frontend/src/components/HomeLanding.tsx": {
@@ -1050,15 +1050,15 @@
     "semantic_hash": ""
   },
   ".github/workflows/backend.yml": {
-    "mtime": 1786840929.1616137,
-    "seen": 1789046699.5102148,
-    "ast_hash": "cb966a360453ad1cb5149d3c9f49916f",
+    "mtime": 1789052075.9663374,
+    "seen": 1789052960.925479,
+    "ast_hash": "7bd514bcb594b306d8755d2d8ce38c37",
     "semantic_hash": ""
   },
   ".github/workflows/frontend.yml": {
-    "mtime": 1786840929.402966,
-    "seen": 1789046699.510216,
-    "ast_hash": "56fe32e217b398af740f68673a8753b3",
+    "mtime": 1789052946.7737994,
+    "seen": 1789052960.925482,
+    "ast_hash": "893b0c74424931d9d4347aa321b4ec3d",
     "semantic_hash": ""
   },
   "00-README.md": {
@@ -1170,9 +1170,9 @@
     "semantic_hash": ""
   },
   "Frontend/src/app/login/login-view.test.tsx": {
-    "mtime": 1789051606.1190767,
-    "seen": 1789051701.3211892,
-    "ast_hash": "6795e2cb4371b6c6b0de421f502a287a",
+    "mtime": 1789051889.062537,
+    "seen": 1789052960.917377,
+    "ast_hash": "67a6d3aeab1bd1b8d2f0fd209d6e5028",
     "semantic_hash": ""
   },
   "Frontend/src/app/login/login-view.tsx": {
@@ -1182,9 +1182,9 @@
     "semantic_hash": ""
   },
   "Frontend/src/lib/telegram.test.ts": {
-    "mtime": 1789051606.1200914,
-    "seen": 1789051701.321465,
-    "ast_hash": "61ca1eced7e1aa46822eac8ad84171a1",
+    "mtime": 1789051846.5239549,
+    "seen": 1789052960.9183319,
+    "ast_hash": "07620714b0cb69c1799379ae159d4167",
     "semantic_hash": ""
   },
   "Frontend/src/lib/telegram.ts": {
@@ -1827,6 +1827,84 @@
     "mtime": 1789051606.117533,
     "seen": 1789051701.321619,
     "ast_hash": "f884360545b57bcf41c8bc52238629d1",
+    "semantic_hash": ""
+  },
+  "Backend/libs/domain/src/auth/auth.service.spec.ts": {
+    "mtime": 1789051908.8378735,
+    "seen": 1789052960.911794,
+    "ast_hash": "1c9c80ce5096ff428bc760599596fb20",
+    "semantic_hash": ""
+  },
+  "Backend/libs/domain/src/auth/policies.service.spec.ts": {
+    "mtime": 1789051909.0739107,
+    "seen": 1789052960.912096,
+    "ast_hash": "2776052643d54da726b6ffeb09c95590",
+    "semantic_hash": ""
+  },
+  "Backend/libs/domain/src/auth/policies.spec.ts": {
+    "mtime": 1789051905.5245204,
+    "seen": 1789052960.912158,
+    "ast_hash": "48bd766baa03a606529575a085e1ea5b",
+    "semantic_hash": ""
+  },
+  "Frontend/e2e/dashboard.spec.ts": {
+    "mtime": 1789052868.238517,
+    "seen": 1789052960.916543,
+    "ast_hash": "3420ef0427d75da9ab7e6f4e08427e40",
+    "semantic_hash": ""
+  },
+  "Frontend/e2e/home.spec.ts": {
+    "mtime": 1789052861.1421256,
+    "seen": 1789052960.916546,
+    "ast_hash": "46aab966a25434d12dd9d190a7ef0b99",
+    "semantic_hash": ""
+  },
+  "Frontend/e2e/login.spec.ts": {
+    "mtime": 1789052862.029157,
+    "seen": 1789052960.9165492,
+    "ast_hash": "624c2d56ab2e052c80a1afe248cbf0d3",
+    "semantic_hash": ""
+  },
+  "Frontend/e2e/payments.spec.ts": {
+    "mtime": 1789052868.2392118,
+    "seen": 1789052960.9165509,
+    "ast_hash": "e897d5327569968157d9885e9540d183",
+    "semantic_hash": ""
+  },
+  "Frontend/playwright.config.ts": {
+    "mtime": 1789052860.5180864,
+    "seen": 1789052960.916689,
+    "ast_hash": "37d322fec8ca53e9fbc8ecccf2ec6568",
+    "semantic_hash": ""
+  },
+  "Frontend/src/app/dashboard/page.test.tsx": {
+    "mtime": 1789052248.938179,
+    "seen": 1789052960.9171488,
+    "ast_hash": "b479ac4cee03f4ccd4b29100bfa6c640",
+    "semantic_hash": ""
+  },
+  "Frontend/src/lib/auth.test.tsx": {
+    "mtime": 1789051851.3330674,
+    "seen": 1789052960.918279,
+    "ast_hash": "e4e856c460525fbdd8b9fde7312dfb5f",
+    "semantic_hash": ""
+  },
+  "Frontend/src/nav/dashboard-nav.test.ts": {
+    "mtime": 1789051856.7925613,
+    "seen": 1789052960.918386,
+    "ast_hash": "343f763a1cbdaad846912d3ee2a1c8b0",
+    "semantic_hash": ""
+  },
+  "Frontend/src/theme/color-mode.test.tsx": {
+    "mtime": 1789051862.0137687,
+    "seen": 1789052960.9184399,
+    "ast_hash": "a927a5a336503989d70cb38f3d872e5a",
+    "semantic_hash": ""
+  },
+  "Frontend/src/theme/theme.test.ts": {
+    "mtime": 1789051862.5570273,
+    "seen": 1789052960.918496,
+    "ast_hash": "7b9314281b57d4a2224e1211803fdcbe",
     "semantic_hash": ""
   }
 }

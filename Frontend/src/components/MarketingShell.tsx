@@ -15,6 +15,8 @@ import { useAuth } from '@/lib/auth';
 const footerLinks = [
   { href: '/how-it-works', label: 'How it works' },
   { href: '/faq', label: 'FAQ' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
   { href: '/privacy', label: 'Privacy' },
   { href: '/terms', label: 'Terms' },
 ] as const;
@@ -78,6 +80,14 @@ export function MarketingShell({ children }: { children: ReactNode }) {
             sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
           >
             FAQ
+          </Button>
+          <Button
+            component={Link}
+            href="/contact"
+            color="inherit"
+            sx={{ display: { xs: 'none', md: 'inline-flex' } }}
+          >
+            Contact
           </Button>
           <Button
             component={Link}

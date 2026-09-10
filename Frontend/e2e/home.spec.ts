@@ -45,9 +45,28 @@ test.describe('Marketing homepage', () => {
     await expect(
       page.getByRole('contentinfo').getByRole('link', { name: /privacy/i }),
     ).toHaveAttribute('href', '/privacy');
+    await expect(
+      page.getByRole('contentinfo').getByRole('link', { name: /about/i }),
+    ).toHaveAttribute('href', '/about');
+    await expect(
+      page.getByRole('contentinfo').getByRole('link', { name: /contact/i }),
+    ).toHaveAttribute('href', '/contact');
     await page.goto('/faq', { waitUntil: 'domcontentloaded' });
     await expect(
       page.getByRole('heading', { name: /how do guests get in/i }),
     ).toBeVisible();
+  });
+
+  test('about and contact pages render', async ({ page }) => {
+    await page.goto('/about', { waitUntil: 'domcontentloaded' });
+    await expect(
+      page.getByRole('heading', { name: /about eventer/i }),
+    ).toBeVisible();
+    await page.goto('/contact', { waitUntil: 'domcontentloaded' });
+    await expect(
+      page.getByRole('heading', { name: /contact us/i }),
+    ).toBeVisible();
+    await expect(page.getByRole('textbox', { name: /^name/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /send message/i })).toBeVisible();
   });
 });

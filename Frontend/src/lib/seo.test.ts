@@ -11,6 +11,8 @@ describe('marketing SEO helpers', () => {
       SITE_URL,
       `${SITE_URL}/how-it-works`,
       `${SITE_URL}/faq`,
+      `${SITE_URL}/about`,
+      `${SITE_URL}/contact`,
       `${SITE_URL}/privacy`,
       `${SITE_URL}/terms`,
     ]);

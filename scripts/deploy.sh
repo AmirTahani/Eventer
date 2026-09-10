@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 # Deploy Eventer on the VPS: pull, build, migrate, restart, reload nginx.
-# Usage (from repo root):
-#   npm run deploy
+# Requires: git, docker compose. Does NOT need Node/npm on the server.
+#
+# Usage (from repo root on the VPS):
 #   ./scripts/deploy.sh
 #   ./scripts/deploy.sh --skip-pull
 #   ./scripts/deploy.sh --skip-nginx
 #   ./scripts/deploy.sh --skip-migrate
+#
+# Optional on a machine that already has Node: npm run deploy
 
 set -euo pipefail
 

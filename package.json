@@ -5,5 +5,6 @@
     "deploy": "bash scripts/deploy.sh",
     "deploy:skip-pull": "bash scripts/deploy.sh --skip-pull",
     "deploy:web-only": "bash scripts/deploy.sh --skip-migrate"
-  }
+  },
+  "description": "Optional npm wrappers. On the VPS (no Node), run: ./scripts/deploy.sh"
 }

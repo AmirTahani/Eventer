@@ -32,4 +32,13 @@ jobs:
       - run: pnpm codegen
       - run: pnpm lint
       - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+        env:
+          CI: true
+          PLAYWRIGHT_PORT: "4010"
+          NEXT_PUBLIC_TELEGRAM_BOT_USERNAME: Eventer_advance_bot
+          TELEGRAM_BOT_USERNAME: Eventer_advance_bot
+          NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:4001
       - run: pnpm build

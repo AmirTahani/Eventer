@@ -47,4 +47,31 @@ describe('verifyTelegramLoginHash', () => {
       reason: 'expired',
     });
   });
+
+  it('accepts payloads within the 24h window', () => {
+    const base = {
+      id: 42,
+      first_name: 'Amir',
+      auth_date: Math.floor(Date.now() / 1000) - 3_600,
+    };
+    const hash = signTelegramLoginPayload(base, botToken);
+    expect(verifyTelegramLoginHash({ ...base, hash }, botToken)).toEqual({
+      ok: true,
+    });
+  });
+
+  it('includes optional fields in the signed check string', () => {
+    const base = {
+      id: 7,
+      first_name: 'Sara',
+      last_name: 'R',
+      username: 'sara',
+      photo_url: 'https://example.com/a.jpg',
+      auth_date: Math.floor(Date.now() / 1000),
+    };
+    const hash = signTelegramLoginPayload(base, botToken);
+    expect(verifyTelegramLoginHash({ ...base, hash }, botToken)).toEqual({
+      ok: true,
+    });
+  });
 });

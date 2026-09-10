@@ -12,6 +12,7 @@ export default defineConfig({
     setupFiles: ['./vitest.setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     css: false,
+    testTimeout: 15_000,
   },
   resolve: {
     alias: {

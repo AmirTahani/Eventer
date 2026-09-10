@@ -8,7 +8,7 @@ describe('validateEnv', () => {
       REFRESH_TOKEN_SECRET: 'dev-refresh-secret-change-me',
     });
 
-    expect(env.PORT).toBe(3000);
+    expect(env.PORT).toBe(4001);
     expect(env.PAYMENT_PROVIDER).toBe('mock');
     expect(env.TELEGRAM_BOT_USERNAME).toBe('EventBot');
   });
@@ -39,7 +39,7 @@ describe('validateEnv', () => {
       ORCARAIL_API_SECRET: 'sk_test',
       ORCARAIL_TOKEN_ID: 'token-usdc-uuid',
       ORCARAIL_NETWORK_ID: 'network-polygon-uuid',
-      ORCARAIL_RETURN_URL: 'http://localhost:3001/payments/return',
+      ORCARAIL_RETURN_URL: 'http://localhost:4000/payments/return',
     });
     expect(env.PAYMENT_PROVIDER).toBe('orcarail');
     expect(env.ORCARAIL_BASE_URL).toBe('https://api.orcarail.com/api/v1');
@@ -75,7 +75,7 @@ describe('validateEnv', () => {
       ORCARAIL_API_SECRET: 'sk',
       ORCARAIL_TOKEN_ID: 'tok',
       ORCARAIL_NETWORK_ID: 'net',
-      ORCARAIL_RETURN_URL: 'http://localhost:3001/payments/return',
+      ORCARAIL_RETURN_URL: 'http://localhost:4000/payments/return',
     };
     expect(() => validateEnv({ ...base, ORCARAIL_API_SECRET: '' })).toThrow(
       /ORCARAIL_API_SECRET/,

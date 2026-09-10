@@ -29,19 +29,25 @@ export default function CreateEventPage() {
   const [visibility, setVisibility] = useState('ALL_APPROVED');
 
   return (
-    <Stack spacing={3} maxWidth={720} width="100%">
+    <Stack spacing={3} maxWidth={720} width="100%" sx={{ pb: { xs: 8, md: 0 } }}>
       <Typography
         variant="h3"
-        sx={{ fontSize: { xs: '1.75rem', md: '2.25rem' } }}
+        sx={{ display: { xs: 'none', md: 'block' }, fontSize: '2.25rem' }}
       >
         Create Event
       </Typography>
-      <Box sx={{ overflowX: 'auto', pb: 1 }}>
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{ display: { xs: 'block', md: 'none' } }}
+      >
+        Step {active + 1} of {steps.length} · {steps[active]}
+      </Typography>
+      <Box sx={{ overflowX: 'auto', pb: 1, display: { xs: 'none', md: 'block' } }}>
         <Stepper
           activeStep={active}
           alternativeLabel
           sx={{
-            minWidth: { xs: 640, md: 'auto' },
             '& .MuiStepLabel-label': { typography: 'caption' },
           }}
         >
@@ -51,6 +57,24 @@ export default function CreateEventPage() {
             </Step>
           ))}
         </Stepper>
+      </Box>
+      <Box
+        sx={{
+          display: { xs: 'flex', md: 'none' },
+          gap: 0.6,
+        }}
+      >
+        {steps.map((label, i) => (
+          <Box
+            key={label}
+            sx={{
+              flex: 1,
+              height: 4,
+              borderRadius: 99,
+              bgcolor: i <= active ? 'primary.main' : 'divider',
+            }}
+          />
+        ))}
       </Box>
 
       <Box>
@@ -118,9 +142,15 @@ export default function CreateEventPage() {
       </Box>
 
       <Stack
-        direction={{ xs: 'column', sm: 'row' }}
+        direction="row"
         spacing={1}
-        sx={{ '& > *': { width: { xs: '100%', sm: 'auto' } } }}
+        sx={{
+          position: { xs: 'sticky', sm: 'static' },
+          bottom: { xs: 8, sm: 'auto' },
+          bgcolor: { xs: 'background.default', sm: 'transparent' },
+          pt: { xs: 1, sm: 0 },
+          '& > *': { flex: { xs: 1, sm: 'none' } },
+        }}
       >
         <Button disabled={active === 0} onClick={() => setActive((s) => s - 1)}>
           Back

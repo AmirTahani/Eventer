@@ -1,10 +1,30 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { AppProviders } from './providers';
 
 export const metadata: Metadata = {
-  title: 'Eventer',
-  description: 'Private event management dashboard',
+  metadataBase: new URL('https://eventer.world'),
+  title: {
+    default: 'Eventer',
+    template: '%s · Eventer',
+  },
+  description:
+    'Invite-gated private events. Guests use Telegram; organizers use the web console.',
+  appleWebApp: {
+    capable: true,
+    title: 'Eventer',
+    statusBarStyle: 'default',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#F3F5F7' },
+    { media: '(prefers-color-scheme: dark)', color: '#0E1116' },
+  ],
 };
 
 export default function RootLayout({
@@ -13,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" style={{ height: '100%' }}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link

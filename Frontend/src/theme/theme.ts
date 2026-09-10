@@ -95,6 +95,8 @@ export function getTheme(
       MuiCssBaseline: {
         styleOverrides: {
           body: {
+            WebkitTapHighlightColor: 'transparent',
+            overscrollBehaviorY: 'none',
             backgroundImage: dark
               ? 'radial-gradient(ellipse 100% 70% at 0% -10%, rgba(45, 212, 191, 0.08), transparent 45%), radial-gradient(ellipse 70% 50% at 100% 0%, rgba(148, 163, 184, 0.06), transparent 40%)'
               : 'radial-gradient(ellipse 120% 80% at 0% -20%, rgba(15, 118, 110, 0.07), transparent 50%), radial-gradient(ellipse 80% 60% at 100% 0%, rgba(15, 23, 42, 0.04), transparent 45%)',
@@ -182,6 +184,21 @@ export function getTheme(
       MuiAlert: {
         styleOverrides: {
           root: { borderRadius: 8 },
+        },
+      },
+      MuiBottomNavigation: {
+        styleOverrides: {
+          root: {
+            backgroundColor: 'transparent',
+          },
+        },
+      },
+      MuiFab: {
+        styleOverrides: {
+          root: {
+            textTransform: 'none',
+            fontWeight: 600,
+          },
         },
       },
     },

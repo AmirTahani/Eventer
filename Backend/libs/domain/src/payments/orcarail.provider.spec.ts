@@ -11,8 +11,8 @@ function buildProvider() {
     baseUrl: 'https://api.orcarail.test/api/v1',
     tokenId: 'token-uuid',
     networkId: 'network-uuid',
-    returnUrl: 'http://localhost:3001/payments/return',
-    cancelUrl: 'http://localhost:3001/payments/cancel',
+    returnUrl: 'http://localhost:4000/payments/return',
+    cancelUrl: 'http://localhost:4000/payments/cancel',
   });
 }
 
@@ -176,14 +176,14 @@ describe('OrcaRailPaymentProvider.createIntent', () => {
         currency: 'usd',
         tokenId: 'token-uuid',
         networkId: 'network-uuid',
-        return_url: 'http://localhost:3001/payments/return',
-        cancel_url: 'http://localhost:3001/payments/cancel',
+        return_url: 'http://localhost:4000/payments/return',
+        cancel_url: 'http://localhost:4000/payments/cancel',
         metadata: { paymentId: 'pay-1', registrationId: 'reg-1' },
       }),
     );
     expect(client.paymentIntents.confirm).toHaveBeenCalledWith('pi_1', {
       client_secret: 'cs_test',
-      return_url: 'http://localhost:3001/payments/return',
+      return_url: 'http://localhost:4000/payments/return',
     });
     expect(result).toEqual({
       provider: 'orcarail',

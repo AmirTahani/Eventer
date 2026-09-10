@@ -15,10 +15,10 @@ export function getTheme(
   const fa = locale === 'fa';
   const display = fa
     ? '"Vazirmatn", sans-serif'
-    : '"Source Serif 4", Georgia, serif';
+    : 'var(--font-source-serif), "Source Serif 4", Georgia, serif';
   const body = fa
     ? '"Vazirmatn", sans-serif'
-    : '"Source Sans 3", system-ui, sans-serif';
+    : 'var(--font-source-sans), "Source Sans 3", system-ui, sans-serif';
   const dark = mode === 'dark';
 
   return createTheme({

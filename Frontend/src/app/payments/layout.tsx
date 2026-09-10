@@ -1,16 +1,15 @@
 import type { Metadata } from 'next';
-import { DashboardShell } from '@/components/DashboardShell';
 import { noIndexRobots } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Dashboard',
+  title: 'Payment',
   robots: noIndexRobots,
 };
 
-export default function DashboardLayout({
+export default function PaymentsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <DashboardShell>{children}</DashboardShell>;
+  return children;
 }

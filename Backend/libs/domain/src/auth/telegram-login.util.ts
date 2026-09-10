@@ -17,7 +17,7 @@ export type TelegramLoginPayload = {
 export function verifyTelegramLoginHash(
   payload: TelegramLoginPayload,
   botToken: string,
-  maxAgeSeconds = 60,
+  maxAgeSeconds = 86_400,
 ): { ok: true } | { ok: false; reason: 'invalid_hash' | 'expired' } {
   const now = Math.floor(Date.now() / 1000);
   if (now - payload.auth_date > maxAgeSeconds) {

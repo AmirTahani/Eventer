@@ -18,9 +18,15 @@ import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import type { SvgIconComponent } from '@mui/icons-material';
 import { ThemeModeSwitch } from '@/components/ThemeModeSwitch';
 import { useAuth } from '@/lib/auth';
+import { fetchPublicConfig } from '@/lib/api';
+import {
+  normalizeTelegramBotUsername,
+  telegramBotUrl,
+} from '@/lib/telegram';
 
 const steps = [
   {
@@ -73,11 +79,32 @@ const features: { title: string; body: string; icon: SvgIconComponent }[] = [
   },
 ];
 
-export function HomeLanding() {
+export function HomeLanding({
+  botUsername,
+}: {
+  botUsername?: string | null;
+}) {
   const { accessToken, ready } = useAuth();
   const signedIn = ready && Boolean(accessToken);
-  const bot =
-    process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME ?? 'EventBot';
+  const [bot, setBot] = useState(
+    () =>
+      normalizeTelegramBotUsername(botUsername) ??
+      normalizeTelegramBotUsername(
+        process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME,
+      ),
+  );
+
+  useEffect(() => {
+    if (bot) return;
+    void fetchPublicConfig()
+      .then((config) => {
+        const name = normalizeTelegramBotUsername(config.telegramBotUsername);
+        if (name) setBot(name);
+      })
+      .catch(() => {
+        /* keep the CTA hidden until we have a real username */
+      });
+  }, [bot]);
 
   return (
     <Box
@@ -163,19 +190,21 @@ export function HomeLanding() {
             >
               {signedIn ? 'Open dashboard' : 'Organizer sign in'}
             </Button>
-            <Button
-              component="a"
-              href={`https://t.me/${bot}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="outlined"
-              size="large"
-              fullWidth
-              startIcon={<TelegramIcon />}
-              sx={{ width: { sm: 'auto' } }}
-            >
-              Telegram bot
-            </Button>
+            {bot ? (
+              <Button
+                component="a"
+                href={telegramBotUrl(bot)}
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="outlined"
+                size="large"
+                fullWidth
+                startIcon={<TelegramIcon />}
+                sx={{ width: { sm: 'auto' } }}
+              >
+                Telegram bot
+              </Button>
+            ) : null}
           </Stack>
           <Typography variant="body2" color="text.secondary">
             The bot will not open events to you without an invitation.

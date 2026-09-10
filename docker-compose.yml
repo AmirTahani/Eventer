@@ -80,6 +80,9 @@ services:
   web:
     build:
       context: ./Frontend
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:4001}
+        NEXT_PUBLIC_TELEGRAM_BOT_USERNAME: ${NEXT_PUBLIC_TELEGRAM_BOT_USERNAME:-}
     env_file: ./Frontend/.env
     environment:
       NEXT_PUBLIC_API_BASE_URL: https://api.eventer.world

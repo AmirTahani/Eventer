@@ -4,8 +4,10 @@ import {
   Header,
   ServiceUnavailableException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
+import type { Env } from '@eventer/common';
 import { PrismaService } from '@eventer/db';
 import { metricsRegistry } from '../observability/metrics';
 
@@ -15,7 +17,19 @@ export class HealthController {
   constructor(
     private readonly health: HealthCheckService,
     private readonly prisma: PrismaService,
+    private readonly config: ConfigService<Env, true>,
   ) {}
+
+  @Get('config')
+  @ApiOperation({ summary: 'Public frontend config (bot username, etc.)' })
+  @ApiOkResponse({ description: 'Non-secret runtime config for the web app' })
+  publicConfig() {
+    return {
+      telegramBotUsername: this.config.get('TELEGRAM_BOT_USERNAME', {
+        infer: true,
+      }),
+    };
+  }
 
   @Get('health')
   @HealthCheck()

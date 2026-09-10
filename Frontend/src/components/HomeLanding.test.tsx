@@ -23,7 +23,7 @@ describe('HomeLanding', () => {
   it('introduces Eventer and links to organizer sign in', () => {
     render(
       <AppProviders>
-        <HomeLanding />
+        <HomeLanding botUsername="EventBot" />
       </AppProviders>,
     );
 

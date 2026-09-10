@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { HomeLanding } from '@/components/HomeLanding';
+import { resolveTelegramBotUsername } from '@/lib/telegram';
 
 export const metadata: Metadata = {
   title: 'Private events, invite only',
@@ -17,5 +18,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <HomeLanding />;
+  return <HomeLanding botUsername={resolveTelegramBotUsername()} />;
 }

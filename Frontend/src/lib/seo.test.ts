@@ -23,7 +23,12 @@ describe('marketing SEO helpers', () => {
     const doc = robots();
     const rules = Array.isArray(doc.rules) ? doc.rules[0] : doc.rules;
     expect(rules.disallow).toEqual(
-      expect.arrayContaining(['/dashboard', '/login', '/payments/']),
+      expect.arrayContaining([
+        '/dashboard',
+        '/login',
+        '/payments/',
+        '/admin',
+      ]),
     );
     expect(doc.sitemap).toBe(`${SITE_URL}/sitemap.xml`);
   });

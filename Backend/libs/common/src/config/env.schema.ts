@@ -39,7 +39,7 @@ export const envSchema = z
     CORS_ORIGIN: z
       .string()
       .default(
-        'http://localhost:4000,https://eventer.world,https://www.eventer.world,https://app.eventer.world',
+        'http://localhost:4000,https://eventer.world,https://www.eventer.world,https://app.eventer.world,https://admin.eventer.world',
       ),
     SENTRY_DSN: z.string().optional(),
     R2_ACCOUNT_ID: z.string().optional(),

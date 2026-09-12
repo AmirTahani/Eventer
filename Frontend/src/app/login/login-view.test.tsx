@@ -11,6 +11,7 @@ vi.mock('next/navigation', () => ({
     push: vi.fn(),
     replace,
   }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 describe('LoginView', () => {
@@ -37,9 +38,11 @@ describe('LoginView', () => {
       </AppProviders>,
     );
 
-    expect(screen.getByRole('heading', { name: /sign in/i })).toBeInTheDocument();
     expect(
-      screen.getByText(/use telegram login with the account that was invited/i),
+      screen.getByRole('heading', { name: /host sign in/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/telegram login for organizers and admins/i),
     ).toBeInTheDocument();
     expect(screen.queryByLabelText(/access token/i)).not.toBeInTheDocument();
     expect(

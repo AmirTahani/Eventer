@@ -100,5 +100,6 @@ describe('validateEnv', () => {
     expect(env.CORS_ORIGIN).toContain('http://localhost:4000');
     expect(env.CORS_ORIGIN).toContain('https://eventer.world');
     expect(env.CORS_ORIGIN).toContain('https://app.eventer.world');
+    expect(env.CORS_ORIGIN).toContain('https://admin.eventer.world');
   });
 });

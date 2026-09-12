@@ -75,7 +75,7 @@ function DrawerNav({
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Toolbar sx={{ px: 2.5 }}>
         <Typography variant="h6" color="primary">
-          Eventer
+          Host console
         </Typography>
       </Toolbar>
       <List sx={{ flex: 1, py: 1 }}>

@@ -13,6 +13,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { CheckinModule } from './checkin/checkin.module';
 import { AuditModule } from './audit/audit.module';
+import { AdminModule } from './admin/admin.module';
 import { RemindersModule } from './reminders/reminders.module';
 
 @Module({
@@ -31,6 +32,7 @@ import { RemindersModule } from './reminders/reminders.module';
     TicketsModule,
     CheckinModule,
     AuditModule,
+    AdminModule,
     RemindersModule,
   ],
   exports: [
@@ -48,6 +50,7 @@ import { RemindersModule } from './reminders/reminders.module';
     TicketsModule,
     CheckinModule,
     AuditModule,
+    AdminModule,
     RemindersModule,
   ],
 })

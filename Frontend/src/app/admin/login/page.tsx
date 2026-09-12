@@ -1,20 +1,18 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { LoginView } from './login-view';
+import { LoginView } from '@/app/login/login-view';
 import { resolveTelegramBotUsername } from '@/lib/telegram';
 import { noIndexRobots } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Host sign in',
-  description:
-    'Sign in to the Eventer organizer console with Telegram. Guests use the bot — not this page.',
+  title: 'Admin sign in',
   robots: noIndexRobots,
 };
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
   return (
     <Suspense fallback={null}>
-      <LoginView botUsername={resolveTelegramBotUsername()} audience="organizer" />
+      <LoginView botUsername={resolveTelegramBotUsername()} audience="admin" />
     </Suspense>
   );
 }

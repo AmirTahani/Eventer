@@ -29,25 +29,7 @@ describe('DashboardHomePage', () => {
     window.localStorage.clear();
   });
 
-  it('shows signed-out overview cards', async () => {
-    render(
-      <AppProviders>
-        <DashboardHomePage />
-      </AppProviders>,
-    );
-
-    expect(
-      await screen.findByRole('heading', { name: /overview/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: /create and publish private events/i }),
-    ).toHaveAttribute('href', '/dashboard/events');
-    expect(
-      screen.getByRole('link', { name: /issue telegram deep links/i }),
-    ).toHaveAttribute('href', '/dashboard/invitations');
-  });
-
-  it('greets an authenticated user', async () => {
+  it('greets an authenticated organizer', async () => {
     window.localStorage.setItem('eventer.accessToken', 'jwt');
     window.localStorage.setItem(
       'eventer.user',
@@ -70,5 +52,8 @@ describe('DashboardHomePage', () => {
       expect(screen.getAllByText(/Sara/).length).toBeGreaterThan(0);
     });
     expect(screen.getByText(/Welcome back, Sara/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /create and publish private events/i }),
+    ).toHaveAttribute('href', '/dashboard/events');
   });
 });

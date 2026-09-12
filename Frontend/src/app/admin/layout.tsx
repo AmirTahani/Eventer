@@ -1,16 +1,16 @@
 import type { Metadata } from 'next';
-import DashboardLayoutClient from './DashboardLayoutClient';
+import { AdminShell } from '@/components/AdminShell';
 import { noIndexRobots } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Organizer console',
+  title: 'Admin',
   robots: noIndexRobots,
 };
 
-export default function DashboardLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <DashboardLayoutClient>{children}</DashboardLayoutClient>;
+  return <AdminShell>{children}</AdminShell>;
 }

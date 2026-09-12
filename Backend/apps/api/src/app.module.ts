@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CommonModule } from '@eventer/common';
 import { DbModule } from '@eventer/db';
 import { DomainModule } from '@eventer/domain';
+import { AdminController } from './admin/admin.controller';
 import { AuditController } from './audit/audit.controller';
 import { AuthController } from './auth/auth.controller';
 import { CheckinController } from './checkin/checkin.controller';
@@ -33,6 +34,7 @@ import { WaitlistController } from './waitlist/waitlist.controller';
     TicketsController,
     CheckinController,
     AuditController,
+    AdminController,
   ],
 })
 export class AppModule {}

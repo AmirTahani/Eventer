@@ -40,6 +40,8 @@ export * from './checkin/checkin.module';
 export * from './checkin/checkin.service';
 export * from './audit/audit.module';
 export * from './audit/audit.service';
+export * from './admin/admin.module';
+export * from './admin/admin.service';
 export * from './reminders/reminders.module';
 export * from './reminders/event-reminders.service';
 export * from './common/money';

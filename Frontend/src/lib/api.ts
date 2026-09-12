@@ -6,7 +6,8 @@ export function getApiBaseUrl(): string {
     if (
       host === 'eventer.world' ||
       host === 'www.eventer.world' ||
-      host === 'app.eventer.world'
+      host === 'app.eventer.world' ||
+      host === 'admin.eventer.world'
     ) {
       return 'https://api.eventer.world';
     }
@@ -141,3 +142,133 @@ export async function createInvitation(
     body,
   });
 }
+
+export type AdminOverview = {
+  users: number;
+  organizers: number;
+  admins: number;
+  events: number;
+  openEvents: number;
+  registrations: number;
+  payments: number;
+  succeededPayments: number;
+  succeededPaymentAmount: string;
+  tickets: number;
+  checkIns: number;
+  invitations: number;
+  waitlist: number;
+  auditLogs: number;
+  notifications: number;
+};
+
+export type AdminListResponse<T> = {
+  items: T[];
+  nextCursor: string | null;
+};
+
+export async function fetchAdminOverview(accessToken: string) {
+  return apiFetch<AdminOverview>('/admin/overview', { accessToken });
+}
+
+export async function fetchAdminUsers(
+  accessToken: string,
+  query: Record<string, string | undefined> = {},
+) {
+  const qs = new URLSearchParams();
+  Object.entries(query).forEach(([k, v]) => {
+    if (v) qs.set(k, v);
+  });
+  const suffix = qs.toString() ? `?${qs}` : '';
+  return apiFetch<AdminListResponse<Record<string, unknown>>>(
+    `/admin/users${suffix}`,
+    { accessToken },
+  );
+}
+
+export async function fetchAdminUser(accessToken: string, id: string) {
+  return apiFetch<Record<string, unknown>>(`/admin/users/${id}`, {
+    accessToken,
+  });
+}
+
+export async function fetchAdminEvents(
+  accessToken: string,
+  query: Record<string, string | undefined> = {},
+) {
+  const qs = new URLSearchParams();
+  Object.entries(query).forEach(([k, v]) => {
+    if (v) qs.set(k, v);
+  });
+  const suffix = qs.toString() ? `?${qs}` : '';
+  return apiFetch<AdminListResponse<Record<string, unknown>>>(
+    `/admin/events${suffix}`,
+    { accessToken },
+  );
+}
+
+export async function fetchAdminEvent(accessToken: string, id: string) {
+  return apiFetch<Record<string, unknown>>(`/admin/events/${id}`, {
+    accessToken,
+  });
+}
+
+export async function fetchAdminPayments(
+  accessToken: string,
+  query: Record<string, string | undefined> = {},
+) {
+  const qs = new URLSearchParams();
+  Object.entries(query).forEach(([k, v]) => {
+    if (v) qs.set(k, v);
+  });
+  const suffix = qs.toString() ? `?${qs}` : '';
+  return apiFetch<AdminListResponse<Record<string, unknown>>>(
+    `/admin/payments${suffix}`,
+    { accessToken },
+  );
+}
+
+export async function fetchAdminRegistrations(
+  accessToken: string,
+  query: Record<string, string | undefined> = {},
+) {
+  const qs = new URLSearchParams();
+  Object.entries(query).forEach(([k, v]) => {
+    if (v) qs.set(k, v);
+  });
+  const suffix = qs.toString() ? `?${qs}` : '';
+  return apiFetch<AdminListResponse<Record<string, unknown>>>(
+    `/admin/registrations${suffix}`,
+    { accessToken },
+  );
+}
+
+export async function fetchAdminTickets(
+  accessToken: string,
+  query: Record<string, string | undefined> = {},
+) {
+  const qs = new URLSearchParams();
+  Object.entries(query).forEach(([k, v]) => {
+    if (v) qs.set(k, v);
+  });
+  const suffix = qs.toString() ? `?${qs}` : '';
+  return apiFetch<AdminListResponse<Record<string, unknown>>>(
+    `/admin/tickets${suffix}`,
+    { accessToken },
+  );
+}
+
+export async function fetchAdminAuditLogs(
+  accessToken: string,
+  query: Record<string, string | undefined> = {},
+) {
+  const qs = new URLSearchParams();
+  Object.entries(query).forEach(([k, v]) => {
+    if (v) qs.set(k, v);
+  });
+  const suffix = qs.toString() ? `?${qs}` : '';
+  return apiFetch<AdminListResponse<Record<string, unknown>>>(
+    `/admin/audit-logs${suffix}`,
+    { accessToken },
+  );
+}
+

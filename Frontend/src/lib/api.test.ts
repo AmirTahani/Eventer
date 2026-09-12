@@ -24,6 +24,11 @@ describe('getApiBaseUrl', () => {
       location: { hostname: 'app.eventer.world' },
     });
     expect(getApiBaseUrl()).toBe('https://api.eventer.world');
+
+    vi.stubGlobal('window', {
+      location: { hostname: 'admin.eventer.world' },
+    });
+    expect(getApiBaseUrl()).toBe('https://api.eventer.world');
   });
 
   it('falls back to NEXT_PUBLIC_API_BASE_URL on localhost', () => {

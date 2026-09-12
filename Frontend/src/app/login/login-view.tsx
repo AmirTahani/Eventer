@@ -7,7 +7,7 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import {
   ApiError,
@@ -17,6 +17,10 @@ import {
 } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { ThemeModeSwitch } from '@/components/ThemeModeSwitch';
+import {
+  canAccessAdminConsole,
+  canAccessOrganizerConsole,
+} from '@/lib/hosts';
 import {
   normalizeTelegramBotUsername,
   parseTelegramLoginSearch,
@@ -30,8 +34,10 @@ declare global {
 
 export function LoginView({
   botUsername,
+  audience = 'organizer',
 }: {
   botUsername?: string | null;
+  audience?: 'organizer' | 'admin';
 }) {
   const [bot, setBot] = useState(
     () =>
@@ -41,11 +47,26 @@ export function LoginView({
       ),
   );
   const widgetHost = useRef<HTMLDivElement | null>(null);
-  const { setSession, accessToken } = useAuth();
+  const { setSession, clearSession, accessToken, user } = useAuth();
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const denied = searchParams.get('denied') === '1';
+  const [error, setError] = useState<string | null>(
+    denied
+      ? audience === 'admin'
+        ? 'Admin access required. Guests and organizers cannot use this panel.'
+        : 'Organizer access required. Guests use Telegram — this console is for hosts.'
+      : null,
+  );
   const [busy, setBusy] = useState(false);
   const completingRef = useRef(false);
+
+  const successHref = audience === 'admin' ? '/admin' : '/dashboard';
+  const title = audience === 'admin' ? 'Admin sign in' : 'Host sign in';
+  const blurb =
+    audience === 'admin'
+      ? 'Telegram Login for Eventer administrators only. Guests stay in Telegram; organizers use the host console.'
+      : 'Telegram Login for organizers and admins. Guests never need this page — they register in the bot.';
 
   async function completeLogin(payload: TelegramLoginPayload) {
     if (completingRef.current) return;
@@ -54,8 +75,23 @@ export function LoginView({
     setError(null);
     try {
       const result = await loginWithTelegram(payload);
+      const roles = result.user.roles;
+      const allowed =
+        audience === 'admin'
+          ? canAccessAdminConsole(roles)
+          : canAccessOrganizerConsole(roles);
+      if (!allowed) {
+        clearSession();
+        setError(
+          audience === 'admin'
+            ? 'This Telegram account is not an admin.'
+            : 'This Telegram account is not an organizer or admin. Guests use the Telegram bot.',
+        );
+        completingRef.current = false;
+        return;
+      }
       setSession(result.accessToken, result.user);
-      router.replace('/dashboard');
+      router.replace(successHref);
     } catch (err) {
       completingRef.current = false;
       setError(
@@ -73,7 +109,11 @@ export function LoginView({
   useEffect(() => {
     const fromRedirect = parseTelegramLoginSearch(window.location.search);
     if (fromRedirect) {
-      window.history.replaceState({}, '', '/login');
+      window.history.replaceState(
+        {},
+        '',
+        audience === 'admin' ? '/admin/login' : '/login',
+      );
       void completeLogin(fromRedirect);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount for Telegram redirect
@@ -94,7 +134,7 @@ export function LoginView({
       })
       .catch(() => {
         setError(
-          'Could not load the Telegram bot username. Check that the API is reachable and CORS_ORIGIN includes this site (eventer.world).',
+          'Could not load the Telegram bot username. Check that the API is reachable and CORS_ORIGIN includes this site.',
         );
       });
   }, [bot]);
@@ -115,13 +155,23 @@ export function LoginView({
     script.setAttribute('data-radius', '8');
     script.setAttribute('data-onauth', 'onTelegramAuth(user)');
     script.setAttribute('data-request-access', 'write');
-    script.setAttribute('data-auth-url', `${window.location.origin}/login`);
+    script.setAttribute(
+      'data-auth-url',
+      `${window.location.origin}${audience === 'admin' ? '/admin/login' : '/login'}`,
+    );
     host.appendChild(script);
 
     return () => {
       delete window.onTelegramAuth;
     };
-  }, [bot, router, setSession]);
+  }, [bot, audience]);
+
+  const alreadySignedIn =
+    accessToken &&
+    user &&
+    (audience === 'admin'
+      ? canAccessAdminConsole(user.roles)
+      : canAccessOrganizerConsole(user.roles));
 
   return (
     <Box
@@ -153,13 +203,13 @@ export function LoginView({
         >
           <Stack spacing={2.5}>
             <Box>
+              <Typography variant="overline" color="primary" sx={{ fontWeight: 700 }}>
+                {audience === 'admin' ? 'Admin panel' : 'Organizer console'}
+              </Typography>
               <Typography variant="h4" gutterBottom>
-                Sign in
+                {title}
               </Typography>
-              <Typography color="text.secondary">
-                Use Telegram Login with the account that was invited
-                {bot ? ` (@${bot})` : ''}.
-              </Typography>
+              <Typography color="text.secondary">{blurb}</Typography>
             </Box>
 
             {error && (
@@ -168,10 +218,10 @@ export function LoginView({
               </Alert>
             )}
 
-            {accessToken && (
+            {alreadySignedIn && (
               <Alert severity="success">
                 You already have a session.{' '}
-                <Link href="/dashboard">Open dashboard</Link>
+                <Link href={successHref}>Open {audience === 'admin' ? 'admin' : 'dashboard'}</Link>
               </Alert>
             )}
 
@@ -192,11 +242,15 @@ export function LoginView({
             ) : null}
 
             <Typography variant="body2" color="text.secondary">
-              If the button is missing, in BotFather set the bot domain to this
-              site (eventer.world) under Bot Settings → Domain.
+              Guests: open the Telegram bot for invites and tickets. This page
+              is not a guest signup.
             </Typography>
 
-            <Button component={Link} href="/" color="inherit">
+            <Button
+              component={Link}
+              href={audience === 'admin' ? 'https://eventer.world' : '/'}
+              color="inherit"
+            >
               Back to home
             </Button>
           </Stack>

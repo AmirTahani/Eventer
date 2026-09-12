@@ -38,7 +38,7 @@ services:
       DATABASE_URL: postgresql://eventer:e1c0cf434108bf3d672a9f9b40866ea74a1c31e0402b05527afd94d651093bcc@postgres:5432/events?schema=public
       REDIS_URL: redis://redis:6379
       # Login runs on eventer.world; dashboard may use app.eventer.world
-      CORS_ORIGIN: ${CORS_ORIGIN:-https://eventer.world,https://www.eventer.world,https://app.eventer.world,http://localhost:4000}
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://eventer.world,https://www.eventer.world,https://app.eventer.world,https://admin.eventer.world,http://localhost:4000}
     depends_on:
       postgres:
         condition: service_healthy
